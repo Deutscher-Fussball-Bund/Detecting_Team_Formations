@@ -14,10 +14,13 @@ rootPlayer = xmlPlayer.getroot()
 #<Objects FeedType="player">
 #<Object ObjectId="DFL-OBJ-0000O3" Type="player" Name="Marco Reus" FirstName="Marco" LastName="Reus" BirthDate="31.05.1989" BirthPlace="Dortmund" CountryOfBirthGerman="Deutschland" CountryOfBirthEnglish="Germany" CountryOfBirthSpanish="Alemania" NationalityGerman="Deutsch" NationalityEnglish="German" NationalitySpanish="alemán" Height="180" Weight="71" ShirtNumber="11" PlayingPositionGerman="Mittelfeld" PlayingPositionEnglish="midField" PlayingPositionSpanish="medio campo" ClubId="DFL-CLU-000N99" ClubName="Deutschland Nationalmannschaft"/>
 players = []
+playerPositions = {}
 for player in rootPlayer.iter('Object'):
-    players.append([player.get('ObjectId'), player.get('Name')])
+    playerPositions[player.get('Name')]['ObjectId'] = player.get('ObjectId')
+    #players.append([player.get('ObjectId'), player.get('Name')])
+print(playerPositions)
 
-playerPositions = []
+playerPositions2 = []
 for frameset in root.iter('FrameSet'):
     positions = []
     for frame in frameset:
@@ -27,10 +30,13 @@ for frameset in root.iter('FrameSet'):
     # String in Float umwandeln
     positions = np.array(positions).astype(np.float)
     # frameset.get('TeamId')
-    playerPositions.append([frameset.get('PersonId'), frameset.get('GameSection'), np.mean(positions)])
+    playerPositions2.append([frameset.get('PersonId'), frameset.get('GameSection'), np.mean(positions)])
 
-
+new_dic = {}
+new_dic[1] = {}
+new_dic[1][2] = 5
 for player in players:
-    for position in playerPositions:
+    for position in playerPositions2:
         if player[0] in position:
+
             print(player[1] + ':', position[2], position[1])
