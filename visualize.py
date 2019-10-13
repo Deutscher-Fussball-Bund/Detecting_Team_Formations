@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Arc, Rectangle, ConnectionPatch
 from matplotlib.offsetbox import OffsetImage
+import pickle
 
 
 # https://github.com/tuangauss/Various-projects/blob/master/Python/football_visual.ipynb
@@ -73,4 +74,13 @@ def draw_positions(array):
     plt.show()
 
 ar = [["Müller", (12,24), (45,56)], ['Meier', (70,20), (70,20)]]
-draw_positions(ar)
+#draw_positions(ar)
+
+with open('playerPositionsFH.pkl', 'rb') as input:
+    playerPositionsFH = pickle.load(input)
+with open('playerPositionsSH.pkl', 'rb') as input:
+    playerPositionsSH = pickle.load(input)
+
+print(playerPositionsFH['DFL-OBJ-0000SE'])
+print(playerPositionsSH['DFL-OBJ-0000SE'])
+

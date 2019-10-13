@@ -1,0 +1,5 @@
+Mögliche Ansätze:
+
+- Standardsituationen über Ball erkennen. Ball ruhrt vor Ausführung.
+- Histogram über Position. Lässt sich so schon offensiv/defensiv-Formationen erkennen?
+- Formationen vorgeben und abgleichen wie groß die Abweichung der Mannschaft zu diesen ist.
