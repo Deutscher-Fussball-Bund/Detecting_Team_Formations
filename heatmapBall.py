@@ -12,14 +12,15 @@ import numpy as np
 import os
             
 RAW_DATA = os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml'
-FIRST_FRAME=9995 #10000
-NUMBER_OF_FRAMES_TO_USE=5000
+FIRST_FRAME=10000
+#NUMBER_OF_FRAMES_TO_USE=5000 #77663
 
 event_data = RawEventDataReader(RAW_DATA)
 ball_columns=["X","Y","Z","D","A","S","M","BallStatus","BallPossession","T","N"]
 ball_df = event_data.create_ball_dataframe(ball_columns)
+FIRST_FRAME = ball_df['N'][0]
 
-print(ball_df.head(10))
+print(FIRST_FRAME)
 
 x_pos=[]
 y_pos=[]

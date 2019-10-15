@@ -24,10 +24,10 @@ class Ball:
 
   def __init__(self,df,frame_number=10000,ID=None):
     self.full_df = df
-
     # Get the row of the frame number
     df =df.loc[df['N'] == frame_number]
     # Then extract the cell for each attribute
+
     self.X = df['X'].iloc[0]
     self.Y = df['Y'].iloc[0]
     self.Z = df['Z'].iloc[0]
