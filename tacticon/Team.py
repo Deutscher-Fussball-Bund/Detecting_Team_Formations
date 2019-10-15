@@ -1,15 +1,9 @@
-from DataReader import DataReader
 import pandas as pd
-from Player import Player
-from Ball import Ball
 from lxml import etree
 
-from RawEventDataReader import RawEventDataReader
 import matplotlib
 matplotlib.use('TKAgg')
 import matplotlib.pyplot as plt
-import networkx as nx
-import ciso8601
 import time
 from tqdm import tqdm
 import math
