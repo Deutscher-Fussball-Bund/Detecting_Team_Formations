@@ -14,28 +14,66 @@ import os
             
 RAW_DATA = os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml'
 #FIRST_FRAME=10000
-NUMBER_OF_FRAMES_TO_USE=15000 #77663
+NUMBER_OF_FRAMES_TO_USE=30000 #77663
 
 event_data = RawEventDataReader(RAW_DATA)
 player_columns=["X","Y","D","A","S","M","T","N"]
-player_df = event_data.create_player_dataframe(player_columns, 'DFL-OBJ-0002F5')
 
-FIRST_FRAME = player_df['N'][0]
-
-print(FIRST_FRAME)
 
 x_pos=[]
 y_pos=[]
-for i in tqdm(range(0,NUMBER_OF_FRAMES_TO_USE)):
+p_id=[]
+players=[]
+for frameset in event_data.xml_root.iter('FrameSet'):
+    if frameset.get('GameSection') != 'firstHalf':continue
+    if frameset.get('TeamId') != 'DFL-CLU-000N99':continue
+    if frameset.get('PersonId') != 'DFL-OBJ-0000I4':continue
+        
+    print(frameset.get('PersonId'))
+    player_df = event_data.create_player_dataframe(player_columns, frameset.get('PersonId')) # 1. + 2. Halbzeit werden zusammengefasst
+    FIRST_FRAME = player_df['N'][0]
+    LAST_FRAME = player_df['N'].iloc[-1]
+    p_id = (frameset.get('PersonId'))
+    x_vals = []
+    y_vals = []
+    #for i in tqdm(range(0,NUMBER_OF_FRAMES_TO_USE)):
+     #   x_vals.append(Player(player_df,FIRST_FRAME+i).X)
+      #  y_vals.append(Player(player_df,FIRST_FRAME+i).Y)
+    #x_pos = np.mean(x_vals)
+    #y_pos = np.mean(y_vals)
+    print(1, x_pos, y_pos)
+    # for i in tqdm(range(0,NUMBER_OF_FRAMES_TO_USE)):
     #PlayerStatus= Player(player_df,FIRST_FRAME+i).BallStatus
     #if PlayerStatus==0:continue
 
-    x= Player(player_df,FIRST_FRAME+i).X
-    y= Player(player_df,FIRST_FRAME+i).Y
-    #speed= Player(player_df,FIRST_FRAME+i).S
+        # x = Player(player_df,FIRST_FRAME+i).X
+        # y = Player(player_df,FIRST_FRAME+i).Y
+        #speed= Player(player_df,FIRST_FRAME+i).S
 
-    x_pos.append(x)
-    y_pos.append(y)
+        # x_pos.append(x)
+        # y_pos.append(y)
+
+    x_pos = player_df['X'].mean()
+    y_pos = player_df['Y'].mean()
+    print(2, x_pos, y_pos)
+    print(player_df['X'])
+    x_vals = []
+    y_vals = []
+    77663
+    #for i in tqdm(range(int(FIRST_FRAME), 141337)):
+    #    x_vals.append(player_df['X'][i])
+    #    y_vals.append(player_df['Y'][i])
+    x_pos = np.mean(x_vals)
+    y_pos = np.mean(y_vals)
+    print(3, x_pos, y_pos)
+
+    players.append([p_id, (x_pos, y_pos)])
+
+Pitch("#195905", "#faf0e6")
+for player in players:
+    plt.annotate(player[0], xy=player[1], zorder=10)
+plt.show()
+quit()
 
 Pitch("#195905","#faf0e6")
 heatmap, xedges, yedges = np.histogram2d(x_pos, y_pos, bins=(105,68))
