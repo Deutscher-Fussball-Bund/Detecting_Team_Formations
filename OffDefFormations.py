@@ -14,7 +14,11 @@ import os
             
 RAW_DATA = os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml'
 #FIRST_FRAME=10000
-NUMBER_OF_FRAMES_TO_USE=30000 #77663
+NUMBER_OF_FRAMES_TO_USE=30000 #77663 <- Erste Halbzeit Ende
+# 118452 <- Zweite Halbzeit Ende Wechsel
+# 100001
+# 173675 <- Zweite Halbzeit Ende
+# 173675
 
 event_data = RawEventDataReader(RAW_DATA)
 player_columns=["X","Y","D","A","S","M","T","N"]
@@ -28,11 +32,23 @@ for frameset in event_data.xml_root.iter('FrameSet'):
     if frameset.get('GameSection') != 'firstHalf':continue
     if frameset.get('TeamId') != 'DFL-CLU-000N99':continue
     if frameset.get('PersonId') != 'DFL-OBJ-0000I4':continue
-        
+
+    #    
+    print(frameset)
+
     print(frameset.get('PersonId'))
     player_df = event_data.create_player_dataframe(player_columns, frameset.get('PersonId')) # 1. + 2. Halbzeit werden zusammengefasst
     FIRST_FRAME = player_df['N'][0]
     LAST_FRAME = player_df['N'].iloc[-1]
+
+    #
+    print(FIRST_FRAME)
+    print(LAST_FRAME)
+    print(Player(player_df, FIRST_FRAME).meanFL('X', FIRST_FRAME, 77663))
+    print(Player(player_df, FIRST_FRAME).meanFL('X', 100001, 173675))
+    
+    
+
     p_id = (frameset.get('PersonId'))
     x_vals = []
     y_vals = []
