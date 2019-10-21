@@ -28,30 +28,30 @@ for frameset in event_data.xml_root.iter('FrameSet'):
    
     player_df = event_data.create_player_dataframe(player_columns, frameset.get('PersonId'))
 
-    for i in range(10002,77663,7500):
-        x_pos,y_pos=[],[]
+    x_pos,y_pos=[],[]
+    for i in range(10002,30000,7500): #range(10002,77663,7500):     
         j = i + 7500
         if j > 77663: j = 77663
         #print(i, j)
 
         x_pos.append(Player(player_df, i).meanFL('X', i, j))
         y_pos.append(Player(player_df, i).meanFL('Y', i, j))
-        playerPositions.append([x_pos, y_pos])
+    playerPositions.append([x_pos, y_pos])
 
-print(playerPositions)
-pos=[]
-for i in range(len(playerPositions[0][0])):
-    x,y = [],[]
-    print(i)
-    for player in playerPositions:
-        x.append(player[0][i])
-        y.append(player[1][i])
-    pos.append([x,y])
-print(pos)
+#quit()
+#pos=[]
+#for i in range(len(playerPositions[0][0])):
+#    x,y = [],[]
+#    print(i)
+#    for player in playerPositions:
+#        x.append(player[0][i])
+#        y.append(player[1][i])
+#    pos.append([x,y])
+#print(pos)
 
 Pitch("#195905", "#faf0e6")
-for positions in pos:
-    plt.scatter(positions[0], positions[1], c=range(0, len(playerPositions)), cmap='rainbow', zorder=10)
+for positions in playerPositions:
+    plt.scatter(positions[0], positions[1], c=range(0, len(positions[0])), cmap='rainbow', zorder=10)
 plt.show()
 
 
