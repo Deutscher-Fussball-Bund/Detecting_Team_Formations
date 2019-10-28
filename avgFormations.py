@@ -49,6 +49,7 @@ for frameset in event_data.xml_root.iter('FrameSet'):
 #    pos.append([x,y])
 #print(pos)
 
+print(playerPositions)
 Pitch("#195905", "#faf0e6")
 for positions in playerPositions:
     plt.scatter(positions[0], positions[1], c=range(0, len(positions[0])), cmap='rainbow', zorder=10)
