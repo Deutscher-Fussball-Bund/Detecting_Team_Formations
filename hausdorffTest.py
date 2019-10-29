@@ -24,19 +24,15 @@ x = [[7,6,8],[1,2,3]]
 
 x=[[[3],[4]],[[18],[-3]],[[6],[13]],[[8],[3]],[[45],[-2]]]
 y=[[[[13],[4]],[[-4],[0]],[[11],[3]],[[28],[5]],[[34],[5]]] , [[[23],[4]],[[2],[25]],[[3],[-2]],[[11],[23]],[[14],[15]]]]
-#x=np.array(x)
+x=np.array(x)
 y=np.array(y)
 
 max_distance=0
 for formation in y:
     max_formation=0
     formation=formation.transpose(2,0,1).reshape(10,-1)
-    permutations=list(itertools.permutations(x))
-    for permutation in permutations:
-        # np.arrays müssen noch in richtige Form gebracht werden
-        # np macht 2-dimensionale Arrays zu 3-dimensionalen Arrays
-        permutation=np.array(permutation).transpose(2,0,1).reshape(10,-1)
-        hd=hausdorff_distance(permutation, formation, distance="euclidean")
-        print(hd)
+    team=np.array(x).transpose(2,0,1).reshape(10,-1)
+    hd=hausdorff_distance(team, formation, distance="euclidean")
+    print(hd)
     #for player in x:
     #    print("Hausdorff distance test: {0}".format( hausdorff_distance(player, formation, distance="euclidean"))) #manhatten,chebshev,cosine

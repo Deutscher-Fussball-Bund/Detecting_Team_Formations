@@ -1,0 +1,42 @@
+Textdatei mit allen Informationen zu Standardformationen
+
+
+Abwehr
+3 Spieler:
+Flach:              -30,20; -30,0; 30,-20
+
+4 Spieler:
+Außen höher:        -25,25; -30,10; -30,-10; -25,-25
+
+5 Spieler:
+Außen höher:        -25,30; -30,20; -30,0; -30,-20; -25,-30
+
+
+Mittelfeld
+2 Spieler:
+Doppel Sechs:       -15,10; -15,-10
+
+4 Spieler:
+Flach:              -15,25; -15,10; -15,-10; -15,-25
+Außen höher:        -10,25; -15,10; -15,-10; -10,-25
+Raute:              -10,25; -15,0; -5,0; -10,-25
+
+Sturm
+2 Spieler:
+Zwei Spitzen:       5,5; 5,-5
+Hängende Spitze:    5,5; 10,-5
+
+3 Spieler:
+Zwei Hängende:      5,5; 10,0; 5,-5
+
+
+++++++++++++++++++
+
+
+Formationen:
+5-2-3
+Drei Stürmer:       -25,30; -30,20; -30,0; -30,-20; -25,-30; -15,10; -15,-10; 5,5; 10,0; 5,-5
+
+4-4-2
+Raute:              -25,25; -30,10; -30,-10; -25,-25; -10,25; -15,0; -5,0; -10,-25; 5,5; 5,-5
+Hängedne Spitze:    -25,25; -30,10; -30,-10; -25,-25; -10,25; -15,10; -15,-10; -10,-25; 5,5; 10,-5
