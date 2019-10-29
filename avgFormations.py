@@ -38,16 +38,6 @@ for frameset in event_data.xml_root.iter('FrameSet'):
         y_pos.append(Player(player_df, i).meanFL('Y', i, j))
     playerPositions.append([x_pos, y_pos])
 
-#quit()
-#pos=[]
-#for i in range(len(playerPositions[0][0])):
-#    x,y = [],[]
-#    print(i)
-#    for player in playerPositions:
-#        x.append(player[0][i])
-#        y.append(player[1][i])
-#    pos.append([x,y])
-#print(pos)
 
 print(playerPositions)
 Pitch("#195905", "#faf0e6")
