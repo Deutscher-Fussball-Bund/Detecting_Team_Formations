@@ -1,11 +1,22 @@
-
+import os
 from tacticon.Pitch import Pitch
 import matplotlib
 matplotlib.use('TKAgg')
 import matplotlib.pyplot as plt
+from avg_formation import get_avg_formations
 
-F532 = [[-25,30], [-30,20], [-30,0], [-30,-20], [-25,-30], [-15,10], [-15,-10], [5,5], [10,0], [5,-5]]
-F442R= [[-25,25], [-30,10], [-30,-10], [-25,-25], [-10,25], [-15,0], [-5,0], [-10,-25], [5,5], [5,-5]]
+playerPositions = get_avg_formations(os.path.dirname(__file__) + '/../Data_STS/zweiteHalbzeit.xml', 168675, 173675, 'DFL-CLU-000N99', game_section='firstHalf')
+print(playerPositions)
+Pitch("#195905", "#faf0e6")
+for positions in playerPositions:
+    plt.scatter(positions[0], positions[1], c=range(0, len(positions[0])), cmap='rainbow', zorder=10)
+plt.show()
+
+quit()
+
+F532 = [[-25,20], [-30,10], [-30,0], [-30,-10], [-25,-20], [-20,5], [-20,-5], [-5,5], [0,0], [-5,-5]]
+F442R= [[-25,15], [-30,5], [-30,-5], [-25,-15], [-15,15], [-20,0], [-10,0], [-15,-15], [-5,5], [-5,-5]]
+
 x_pos=[]
 y_pos=[]
 playerPositions=[]
