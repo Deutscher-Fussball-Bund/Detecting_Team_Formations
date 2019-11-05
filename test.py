@@ -16,7 +16,7 @@ for i, positions in enumerate(playerPositions):
     plt.annotate(shirtnumbers[i], (positions[0][0],positions[1][0]), textcoords="offset points", xytext=(0,10), ha='center')
 plt.show()
 
-#quit()
+quit()
 
 playerPositions = combine_xy(playerPositions,'purple')
 
