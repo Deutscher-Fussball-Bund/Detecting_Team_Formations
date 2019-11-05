@@ -4,12 +4,14 @@ import matplotlib
 matplotlib.use('TKAgg')
 import matplotlib.pyplot as plt
 from avg_formation import get_avg_formations
+import random
 
-playerPositions = get_avg_formations(os.path.dirname(__file__) + '/../Data_STS/zweiteHalbzeit.xml', 168675, 173675, 'DFL-CLU-000N99', game_section='firstHalf')
-print(playerPositions)
+playerPositions = get_avg_formations(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml', 50000, 101000, 'DFL-CLU-000N99')
+print(playerPositions) #zweiteHalbzeit.xml
 Pitch("#195905", "#faf0e6")
 for positions in playerPositions:
     plt.scatter(positions[0], positions[1], c=range(0, len(positions[0])), cmap='rainbow', zorder=10)
+    plt.annotate(random.randrange(11), (positions[0][0],positions[1][0]), textcoords="offset points", xytext=(0,10), ha='center')
 plt.show()
 
 quit()

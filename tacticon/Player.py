@@ -54,5 +54,22 @@ class Player:
       Args:
         col (str): Attribute to get the mean on
       """
-      df = self.full_df[(self.full_df[f"N"] >= FIRST_FRAME) & (self.full_df[f"N"] <= LAST_FRAME)]
-      return df[f"{col}"].mean()
+      if(FIRST_FRAME<100000 and LAST_FRAME>100000):
+        print('bin hier')
+        df_fh = self.full_df[(self.full_df[f"N"] >= FIRST_FRAME) & (self.full_df[f"N"] <= 99999)]
+        df_sh = self.full_df[(self.full_df[f"N"] >= 100000) & (self.full_df[f"N"] <= LAST_FRAME)]
+        print('MeanFL')
+        print(df_fh[f"{col}"].mean())
+        print(df_sh[f"{col}"].mean()*-1)
+        print((df_fh[f"{col}"].mean() + df_sh[f"{col}"].mean()*-1)/2)
+        return (df_fh[f"{col}"].mean() + df_sh[f"{col}"].mean()*-1)/2
+      
+      if(LAST_FRAME<100000):
+        print('da')
+        df = self.full_df[(self.full_df[f"N"] >= FIRST_FRAME) & (self.full_df[f"N"] <= LAST_FRAME)]
+        return df[f"{col}"].mean()
+      
+      if(FIRST_FRAME>=100000):
+        print('dort')
+        df = self.full_df[(self.full_df[f"N"] >= FIRST_FRAME) & (self.full_df[f"N"] <= LAST_FRAME)]
+        return df[f"{col}"].mean()*-1
