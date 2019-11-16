@@ -6,22 +6,42 @@ import matplotlib.pyplot as plt
 
 from tacticon.Pitch import Pitch
 from avg_formation import get_avg_formations
-from array_operations import combine_xy
+from array_operations import combine_xy, get_mean, move_formation
+from hausdorff_metric import get_hausdorff
 
 playerPositions, shirtnumbers = get_avg_formations(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml', 50000, 101000, 'DFL-CLU-000N99')
-print(playerPositions) #zweiteHalbzeit.xml
+#print(playerPositions) #zweiteHalbzeit.xml
 Pitch("#195905", "#faf0e6")
 for i, positions in enumerate(playerPositions):
     plt.scatter(positions[0], positions[1], c='red', zorder=10)
-    plt.annotate(shirtnumbers[i], (positions[0][0],positions[1][0]), textcoords="offset points", xytext=(0,10), ha='center')
+    plt.annotate(shirtnumbers[i], (positions[0],positions[1]), textcoords="offset points", xytext=(0,10), ha='center')
+
+team_mean=get_mean(playerPositions)
+plt.scatter(team_mean[0], team_mean[1], c='grey', zorder=10)
+plt.show()
+
+#quit()
+
+F532=[[-25,20], [-30,10], [-30,0], [-30,-10], [-25,-20], [-20,5], [-20,-5], [-10,5], [-5,0], [-10,-5]]
+F532_moved = move_formation(team_mean, F532)
+
+F442R=[[-25,15], [-30,5], [-30,-5], [-25,-15], [-15,15], [-20,0], [-10,0], [-15,-15], [-10,5], [-10,-5]]
+F442R_moved = move_formation(team_mean, F442R)
+
+print(get_hausdorff(playerPositions, F532_moved))
+print(get_hausdorff(playerPositions, F442R_moved))
+
+Pitch("#195905", "#faf0e6")
+for i, positions in enumerate(F532_moved):
+    plt.scatter(positions[0], positions[1], c='red', zorder=10)
 plt.show()
 
 quit()
 
-playerPositions = combine_xy(playerPositions,'purple')
+#playerPositions = combine_xy(playerPositions,'purple')
 
-F532 = [[-25,20], [-30,10], [-30,0], [-30,-10], [-25,-20], [-20,5], [-20,-5], [-5,5], [0,0], [-5,-5]]
-F442R= [[-25,15], [-30,5], [-30,-5], [-25,-15], [-15,15], [-20,0], [-10,0], [-15,-15], [-5,5], [-5,-5]]
+
+
 
 x_pos=[]
 y_pos=[]

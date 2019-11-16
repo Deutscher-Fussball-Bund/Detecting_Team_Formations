@@ -3,7 +3,7 @@ import numpy as np
 
 from tacticon.RawEventDataReader import RawEventDataReader
 from tacticon.Player import Player
-from matchinformation import get_shitnumbers
+from matchinformation import get_shitnumbers, get_gks
 
 
 
@@ -20,6 +20,9 @@ def get_avg_formations(path, first_frame, last_frame, team_id):
     # DE 'DFL-CLU-000N99'
     event_data = RawEventDataReader(path)
     player_columns=["X","Y","D","A","S","M","T","N"]
+    #Unbedingt bessere Lösung!!
+    path=os.path.dirname(__file__) + '/../Data_STS/DFL_01_05_masterdata_DFL-CLU-000N99_DFL-SEA-0001K4_player.xml'
+    gk_ids = get_gks(path)
 
     player_positions=[]
     person_ids=[]
@@ -27,9 +30,8 @@ def get_avg_formations(path, first_frame, last_frame, team_id):
         #Prüft ob der Spieler im richtigen Team ist und ob er schon betrachtet worden ist
         #Spieler können zweimal im Datensatz vorkommen, da es für erste und zweite Halbzeit FrameSets gibt
         if frameset.get('TeamId') != team_id:continue
+        if (frameset.get('PersonId') in gk_ids):continue
         if (frameset.get('PersonId') in person_ids):continue
-
-        #if frameset.get('PersonId') != 'DFL-OBJ-0000I4':continue
 
         print(frameset.get('PersonId'))
         person_ids.append(frameset.get('PersonId'))
@@ -40,9 +42,9 @@ def get_avg_formations(path, first_frame, last_frame, team_id):
         if(abort):continue
 
         #Durchschnittliche X- und Y-Position für Spieler wird berechnet
-        x_pos,y_pos=[],[]
-        x_pos.append(Player(player_df, ff).meanFL('X', ff, lf))
-        y_pos.append(Player(player_df, ff).meanFL('Y', ff, lf))
+        #x_pos,y_pos=[],[]
+        x_pos = Player(player_df, ff).meanFL('X', ff, lf)
+        y_pos = Player(player_df, ff).meanFL('Y', ff, lf)
 
         player_positions.append([x_pos, y_pos])
 
