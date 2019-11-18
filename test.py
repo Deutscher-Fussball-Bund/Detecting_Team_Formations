@@ -28,6 +28,8 @@ F532_moved = move_formation(team_mean, F532)
 F442R=[[-25,15], [-30,5], [-30,-5], [-25,-15], [-15,15], [-20,0], [-10,0], [-15,-15], [-10,5], [-10,-5]]
 F442R_moved = move_formation(team_mean, F442R)
 
+formations=[F442R_moved, F532_moved]
+##hier
 print(get_hausdorff(playerPositions, F532_moved))
 print(get_hausdorff(playerPositions, F442R_moved))
 
