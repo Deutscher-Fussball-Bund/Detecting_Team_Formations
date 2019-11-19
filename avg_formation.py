@@ -6,7 +6,6 @@ from tacticon.Player import Player
 from matchinformation import get_shitnumbers, get_gks
 
 
-
 def get_avg_formations(path, first_frame, last_frame, team_id):
     """
     Berechnet die durchschnittliche Formation einer Mannschaft in einer gegebenen Zeitspanne.
@@ -17,8 +16,11 @@ def get_avg_formations(path, first_frame, last_frame, team_id):
         last_frame: Ende der Zeitspanne.
         team_id: ID der Mannschaft die betrachtet werden soll.
     """
+
+    print('Positionsdaten werden geladen.')
+
     # DE 'DFL-CLU-000N99'
-    event_data = RawEventDataReader(path)
+    #event_data = RawEventDataReader(path)  <-- verlagert
     player_columns=["X","Y","D","A","S","M","T","N"]
     #Unbedingt bessere Lösung!!
     path=os.path.dirname(__file__) + '/../Data_STS/DFL_01_05_masterdata_DFL-CLU-000N99_DFL-SEA-0001K4_player.xml'
@@ -26,6 +28,7 @@ def get_avg_formations(path, first_frame, last_frame, team_id):
 
     player_positions=[]
     person_ids=[]
+    print('Aktueller Fortschritt:')
     for frameset in event_data.xml_root.iter('FrameSet'):
         #Prüft ob der Spieler im richtigen Team ist und ob er schon betrachtet worden ist
         #Spieler können zweimal im Datensatz vorkommen, da es für erste und zweite Halbzeit FrameSets gibt
@@ -51,6 +54,7 @@ def get_avg_formations(path, first_frame, last_frame, team_id):
     #Muss noch dynamisch gesetzt werden
     path=os.path.dirname(__file__) + '/../Data_STS/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-X03BWS.xml'
     shirtnumbers=get_shitnumbers(person_ids,path)
+    print('Alle Spieler wurden geladen.')
     return player_positions, shirtnumbers
 
 def check_subs(player_df, first_frame, last_frame):
