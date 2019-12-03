@@ -1,3 +1,6 @@
+def say_hi():
+    return 'hi'
+
 def get_formations():
     """
     Returns all predefined formations.

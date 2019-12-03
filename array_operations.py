@@ -35,3 +35,13 @@ def move_formation(team_mean, formations):
             player[1] += dif_y
         
     return formations
+
+### [[[-21.236895403064622, -4.544330446369087, -3.240826115922718], [-16.881978680879413, -13.246682211858761, 9.312365089940041]]
+##->[[[-21...,-16..],[...]]] 
+def extract_formations(array):
+    print(array)
+    print(array[0])
+    quit()
+
+    formations=[]
+    #for player in array:
