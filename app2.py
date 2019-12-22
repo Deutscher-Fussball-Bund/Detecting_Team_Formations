@@ -1,3 +1,4 @@
+import io
 import base64
 import os.path
 
@@ -10,12 +11,36 @@ from dash.dependencies import Input, Output
 from tacticon.RawEventDataReader import RawEventDataReader
 import xml.etree.ElementTree as ET
 
+from plotly.tools import mpl_to_plotly
+import dash_core_components as dcc
+from tacticon.Pitch import Pitch
+
+import matplotlib
+matplotlib.use('TKAgg')
+import matplotlib.pyplot as plt
+
+import numpy as np
+
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 dash_resumable_upload.decorate_server(app.server, "uploads")
+
+#n = 50
+#x, y, z, s, ew = np.random.rand(5, n)
+#c, ec = np.random.rand(2, n, 4)
+#area_scale, width_scale = 500, 5
+
+#fig, ax = plt.subplots()
+#sc = ax.scatter(x, y, c=c,
+#                s=np.square(s)*area_scale,
+#                edgecolor=ec,
+#                linewidth=ew*width_scale)
+#ax.grid()
+
+#plotly_fig = mpl_to_plotly(fig)
 
 app.layout = html.Div([
     dash_resumable_upload.Upload(
@@ -40,13 +65,27 @@ app.layout = html.Div([
         # Allow multiple files to be uploaded
         #multiple=True
     ),
-    html.Div(id='output')
+
+    #dcc.Graph(id='myGraph', figure=plotly_fig),
+
+    html.Div(id='output'),
+
+    html.Img(id='example')
 ])
 
-@app.callback(Output('output', 'children'),
+
+@app.callback(Output('example', 'src'),
               [Input('upload', 'fileNames')])
 
 def display_files(fileNames):
+    Pitch("#195905","#faf0e6")
+    buf = io.BytesIO() # in-memory files
+    plt.savefig(buf, format = "png") # save to the above file object
+    data = base64.b64encode(buf.getbuffer()).decode("utf8") # encode to html elements
+    plt.close()
+    return "data:image/png;base64,{}".format(data)
+
+
     if fileNames is not None:
         print(fileNames)
         path = os.path.dirname(__file__) + '/../uploads/' + fileNames[0]
@@ -54,7 +93,7 @@ def display_files(fileNames):
         event_data = RawEventDataReader(path)
         
         for player in event_data.xml_root.iter('FrameSet'):
-                print(player.get('PlayerId'))
+                print(player.get('PersonId'))
 
 
         return html.Ul(html.Li(fileNames))
