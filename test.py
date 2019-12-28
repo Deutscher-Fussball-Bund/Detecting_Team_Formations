@@ -1,33 +1,205 @@
 import os
-import random
-from tacticon.RawEventDataReader import RawEventDataReader
+import numpy as np
 
-import xml.etree.ElementTree as ET
+from start_analysis import start_analysis
+from avg_formation import get_gks
+from Team import create_team_df
 
-from avg_formation import get_avg_formation, get_avg_formations
-from hausdorff_metric import calculate_formation,calculate_formations
-from array_operations import extract_formations
 
-print('Positionsdaten werden geladen.')
-event_data = RawEventDataReader(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml')
+"""
+Halbzeit 1 beginnt bei:
+10002.0
+und endet bei:
+77663.0
+Halbzeit 2 beginnt bei:
+100001.0
+und endet bei:
+173675.0
 
-print('')
-player_positions, shirtnumbers = get_avg_formations(event_data, 101000, 120000, 'DFL-CLU-000N99')
-#player_positions = [[[-21.236895403064622, -4.544330446369087, -3.240826115922718], [-16.881978680879413, -13.246682211858761, 9.312365089940041]], [[-41.55300466355763, -23.541585609593604, -23.457041972018658], [-17.913850766155896, -24.683664223850766, -12.417528314457028]], [[-36.275636242504994, -23.014123917388407, -19.765922718187877], [2.5198134576948705, 13.908474350433046, 29.47172551632245]], [[-40.39473684210526, -26.074363757495, -33.77700866089274], [-10.95502331778814, -6.835469686875417, 10.300739506995338]], [[-25.151252498334443, -26.020706195869423, -32.11766822118588], [-27.857268487674883, -19.503764157228513, -4.046628914057296]], [[-39.15168554297135, -19.207288474350435, -22.97120586275816], [-21.073344437041975, -18.146568954030645, 7.922471685542972]], [[-23.432558294470354, -5.309960026648901, -10.552651565622917], [-12.453777481678882, -1.8568221185876082, 16.883924050632913]], [[-41.01299800133245, -25.982604930046634, -29.435822784810124], [-3.0687275149900066, 2.319493670886076, 24.174163890739507]], [[-36.21486342438374, -11.044243837441705, -5.633544303797469], [-27.255876082611593, -22.970759493670883, 5.7023317788141235]], [[-33.12347768154564, -15.901778814123917, -23.367441705529647], [-13.310086608927381, -5.98599600266489, 21.03724183877415]]]
-print('Positionsdaten sind geladen.')
-formations=extract_formations(player_positions)
-print('Formationen wurden extrahiert.')
-calculate_formations(formations)
+DFL-OBJ-0000ZS
+157872.0
+173675.0
+DFL-OBJ-0000O3
+122801.0
+173675.0
+DFL-OBJ-00021U
+122556.0
+173675.0
+DFL-OBJ-0027GH
+10002.0
+122555.0
+DFL-OBJ-0000OJ
+10002.0
+122800.0
+DFL-OBJ-000280
+10002.0
+157871.0
+"""
+
+def get_substitutions(team_df, halftime):
+    #Auswechslung erkennen
+    substitutions = {}
+    for player in team_df.columns:
+        if team_df[player].isnull().values.any():
+            print(player)
+            print(team_df[team_df[player].isnull()].index[0])
+            print(team_df[team_df[player].isnull()].index[-1])
+            #print(team_df[team_df[player].isnull()])
+            #quit()
+            if team_df[team_df[player].isnull()].index[0]==halftime[0]:
+                if team_df[team_df[player].isnull()].index[-1] not in substitutions.keys():
+                    substitutions[team_df[team_df[player].isnull()].index[-1]] = {}
+                substitutions[team_df[team_df[player].isnull()].index[-1]]['on'] = player[0]
+            if team_df[team_df[player].isnull()].index[-1]==halftime[3]:
+                if team_df[team_df[player].isnull()].index[0]-1 not in substitutions.keys():
+                    substitutions[team_df[team_df[player].isnull()].index[0]-1] = {}
+                substitutions[team_df[team_df[player].isnull()].index[0]-1]['off'] = player[0]        
+    return substitutions
+
+def get_halftime(team_df):
+    """
+    Gibt den ersten und letzten Frame einer Halbzeit zurück.
+    """
+    halftime=[]
+    for half in team_df.groupby(team_df.index.to_series().diff().ne(1).cumsum()).groups:
+        halftime.append(team_df.groupby(team_df.index.to_series().diff().ne(1).cumsum()).groups[half][0])
+        halftime.append(team_df.groupby(team_df.index.to_series().diff().ne(1).cumsum()).groups[half][-1])
+    return halftime
+
+def get_formation(team_df,ff,lf):
+    k=0
+    formation=[]
+    while k<len(team_df[ff:lf].mean(skipna = True)):
+        if np.isnan(team_df.loc[ff][k]):
+            k+=2
+            continue
+        formation.append([round(team_df[ff:lf].mean(skipna = True)[k],2),round(team_df[ff:lf].mean(skipna = True)[k+1],2)])
+        k+=2
+    print(formation)
+
+
+def make_intervalls(team_df,frames,halftimes,substitutions):
+    i = halftime[0]
+    while i<halftime[1]:
+        j=i+frames
+        if j>halftime[1]:j=halftime[1]
+        print('')
+        for substitution in substitutions:
+            if substitution>i and substitution<j:
+                print('Auswechslung nach Zeitintervall')
+                j=substitution
+        
+        print(i,j)
+        get_formation(team_df,i,j)
+        i=j+1
+    
+    i = halftime[2]
+    while i<halftime[3]:
+        j=i+frames
+        if j>halftime[3]:j=halftime[3]
+        print('')
+        for substitution in substitutions:
+            if substitution>i and substitution<j:
+                print('Auswechslung nach Zeitintervall')
+                j=substitution
+        
+        print(i,j)
+        get_formation(team_df,i,j)
+        i=j+1
+    
+
+
+team_df = create_team_df(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml', 'DFL-CLU-000N99')
+#'/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml', 'DFL-CLU-000N99')
+#start_analysis(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml', 180, 'DFL-CLU-000N99')
+#print('')
+print('Torhüter werden entfernt.')
+path=os.path.dirname(__file__) + '/../Data_STS/DFL_01_05_masterdata_DFL-CLU-000N99_DFL-SEA-0001K4_player.xml'
+gk_ids = get_gks(path)
+for gk in gk_ids:
+    if gk in team_df.columns:
+        team_df.drop(columns=[gk], level=0, inplace=True)
+
+#print('')
+#print('')
+#print('')
+
+#print(team_df.loc[122555.0])
+#print(team_df.loc[122556.0])
+#print(team_df.loc[122557.0])
+#quit()
+
+halftime=get_halftime(team_df)
+substitutions=get_substitutions(team_df,halftime)
+make_intervalls(team_df,10000,halftime,substitutions)
+
+
+
+
 
 quit()
 
-
-#print('')
-#quit()
-player_positions, shirtnumbers = get_avg_formation(event_data, 30000, 50000, 'DFL-CLU-000N99')
-calculate_formation(player_positions)
+# [[23,34],[344,45],..]
 
 print('')
+print('')
+
+print(team_df[10003.0:10007.0])
+
+print('')
+print('')
+
+print(team_df[10003.0:10007.0].mean())
+
+print('')
+for val in team_df[10003.0:10007.0].mean(skipna = True):
+    print(val)
+print('')
+
+print('')
+i=0
+while i<len(team_df[10003.0:10007.0].mean(skipna = True)):
+    print(team_df[10003.0:10007.0].mean(skipna = True)[i],team_df[10003.0:10007.0].mean(skipna = True)[i+1])
+    i+=2
+print('')
+#isnull().values.any()
 
 
-#array=[[[-21.236895403064622, -4.544330446369087, -3.240826115922718], [-16.881978680879413, -13.246682211858761, 9.312365089940041]], [[-41.55300466355763, -23.541585609593604, -23.457041972018658], [-17.913850766155896, -24.683664223850766, -12.417528314457028]], [[-36.275636242504994, -23.014123917388407, -19.765922718187877], [2.5198134576948705, 13.908474350433046, 29.47172551632245]], [[-40.39473684210526, -26.074363757495, -33.77700866089274], [-10.95502331778814, -6.835469686875417, 10.300739506995338]], [[-25.151252498334443, -26.020706195869423, -32.11766822118588], [-27.857268487674883, -19.503764157228513, -4.046628914057296]], [[-39.15168554297135, -19.207288474350435, -22.97120586275816], [-21.073344437041975, -18.146568954030645, 7.922471685542972]], [[-23.432558294470354, -5.309960026648901, -10.552651565622917], [-12.453777481678882, -1.8568221185876082, 16.883924050632913]], [[-41.01299800133245, -25.982604930046634, -29.435822784810124], [-3.0687275149900066, 2.319493670886076, 24.174163890739507]], [[-36.21486342438374, -11.044243837441705, -5.633544303797469], [-27.255876082611593, -22.970759493670883, 5.7023317788141235]], [[-33.12347768154564, -15.901778814123917, -23.367441705529647], [-13.310086608927381, -5.98599600266489, 21.03724183877415]]]
+
+
+
+    
+
+quit()
+"""
+arrays1 = [['Neuer', 'Neuer', 'Boateng', 'Boateng', 'Gnabry', 'Gnabry', 'Draxler', 'Draxler'],['X', 'Y', 'X', 'Y', 'X', 'Y', 'X', 'Y']]
+tuples1 = list(zip(*arrays1))
+index1 = pd.MultiIndex.from_tuples(tuples1, names=['', ''])
+df1 = pd.DataFrame(np.random.randn(3, 8), index=['10002', '10003', '10004'], columns=index1)
+#print(df1)
+
+arrays2 = [['Tah', 'Tah'],['X', 'Y']]
+tuples2 = list(zip(*arrays2))
+index2 = pd.MultiIndex.from_tuples(tuples2, names=['', ''])
+df2 = pd.DataFrame(np.random.randn(2, 2), index=['10002', '10003'], columns=index2)
+#print(df2)
+df2 = pd.concat([df1, df2], axis=1, sort=False)
+#print(df2)
+
+
+arrays3 = [['Götze', 'Götze'],['X', 'Y']]
+tuples3 = list(zip(*arrays3))
+index3 = pd.MultiIndex.from_tuples(tuples3, names=['', ''])
+df3 = pd.DataFrame(np.random.randn(1, 2), index=['10004'], columns=index3)
+#print(df3)
+df3 = pd.concat([df2, df3], axis=1, sort=False)
+print(df3)
+
+
+#print('')
+#print(df3.loc[['10003']])
+#print(df3.loc[['10003']]['Neuer'])
+#print(df3.loc[['10003']]['Neuer']['X'])
+#print('')
+#print(df3['Tah'])
+"""

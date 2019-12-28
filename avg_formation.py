@@ -5,7 +5,7 @@ from tacticon.RawEventDataReader import RawEventDataReader
 from tacticon.Player import Player
 from matchinformation import get_shitnumbers, get_gks
 
-def get_avg_formations(event_data, first_frame, last_frame, team_id):
+def get_avg_formations(team_df, seconds):
     """
     Berechnet die durchschnittliche Formation einer Mannschaft in einer gegebenen Zeitspanne.
 
@@ -16,8 +16,6 @@ def get_avg_formations(event_data, first_frame, last_frame, team_id):
         team_id: ID der Mannschaft die betrachtet werden soll.
     """
 
-    # DE 'DFL-CLU-000N99'
-    #event_data = RawEventDataReader(path)
     player_columns=["X","Y","D","A","S","M","T","N"]
     #Unbedingt bessere Lösung!!
     path=os.path.dirname(__file__) + '/../Data_STS/DFL_01_05_masterdata_DFL-CLU-000N99_DFL-SEA-0001K4_player.xml'
@@ -25,6 +23,8 @@ def get_avg_formations(event_data, first_frame, last_frame, team_id):
 
     player_positions=[]
     person_ids=[]
+    #Da eine Sekunde aus 25 Frames besteht
+    time_intervall *= 25
     print('Aktueller Fortschritt:')
     for frameset in event_data.xml_root.iter('FrameSet'):
         #Prüft ob der Spieler im richtigen Team ist und ob er schon betrachtet worden ist
@@ -38,15 +38,19 @@ def get_avg_formations(event_data, first_frame, last_frame, team_id):
 
         #Erstellt Player DataFrame und prüft, ob er Spieler im gegebenen Zeitintervall auf dem Feld stand
         player_df = event_data.create_player_dataframe(player_columns, frameset.get('PersonId'))
+        first_frame,last_frame = get_time_frames(player_df)
         ff, lf, abort = check_subs(player_df, first_frame, last_frame)
         if(abort):continue
 
         x_pos,y_pos=[],[]
-        for i in range(ff, lf+1, 25*60):       
+        
+        ff=int(ff)
+        lf=int(lf)
+        for i in range(ff, lf+1, time_intervall):
+            print('hier: i, ff, lf, time_intervall', i,ff,lf,time_intervall)       
             #Durchschnittliche X- und Y-Position für Spieler wird berechnet
-            #
-            x_pos.append(Player(player_df, ff).meanFL('X', i,i + 25*60))
-            y_pos.append(Player(player_df, ff).meanFL('Y', i,i + 25*60))
+            x_pos.append(Player(player_df, ff).meanFL('X', i,i + time_intervall))
+            y_pos.append(Player(player_df, ff).meanFL('Y', i,i + time_intervall))
 
         player_positions.append([x_pos, y_pos])
 
@@ -58,7 +62,7 @@ def get_avg_formations(event_data, first_frame, last_frame, team_id):
 
 
 
-def get_avg_formation(event_data, first_frame, last_frame, team_id):
+def get_avg_formation(event_data, team_id):
     """
     Berechnet die durchschnittliche Formation einer Mannschaft in einer gegebenen Zeitspanne.
 
@@ -69,9 +73,6 @@ def get_avg_formation(event_data, first_frame, last_frame, team_id):
         team_id: ID der Mannschaft die betrachtet werden soll.
     """
 
-    # DE 'DFL-CLU-000N99'
-    #event_data = RawEventDataReader(path)
-    player_columns=["X","Y","D","A","S","M","T","N"]
     #Unbedingt bessere Lösung!!
     path=os.path.dirname(__file__) + '/../Data_STS/DFL_01_05_masterdata_DFL-CLU-000N99_DFL-SEA-0001K4_player.xml'
     gk_ids = get_gks(path)
@@ -91,13 +92,14 @@ def get_avg_formation(event_data, first_frame, last_frame, team_id):
 
         #Erstellt Player DataFrame und prüft, ob er Spieler im gegebenen Zeitintervall auf dem Feld stand
         player_df = event_data.create_player_dataframe(player_columns, frameset.get('PersonId'))
+        first_frame,last_frame = get_time_frames(player_df)
         ff, lf, abort = check_subs(player_df, first_frame, last_frame)
         if(abort):continue
 
         #Durchschnittliche X- und Y-Position für Spieler wird berechnet
         #x_pos,y_pos=[],[]
-        x_pos = Player(player_df, ff).meanFL('X', ff, lf)
-        y_pos = Player(player_df, ff).meanFL('Y', ff, lf)
+        x_pos=Player(player_df, ff).meanFL('X', ff, lf)
+        y_pos=Player(player_df, ff).meanFL('Y', ff, lf)
 
         player_positions.append([x_pos, y_pos])
 
@@ -106,6 +108,11 @@ def get_avg_formation(event_data, first_frame, last_frame, team_id):
     shirtnumbers=get_shitnumbers(person_ids,path)
     print('Alle Spieler wurden geladen.')
     return player_positions, shirtnumbers
+
+def get_time_frames(player_df):
+    first_frame = player_df['N'][0]
+    last_frame = player_df['N'].iloc[-1]
+    return first_frame, last_frame
 
 def check_subs(player_df, first_frame, last_frame):
     """
