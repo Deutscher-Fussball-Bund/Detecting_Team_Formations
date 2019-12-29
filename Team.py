@@ -1,6 +1,6 @@
 from tacticon.RawEventDataReader import RawEventDataReader
 import pandas as pd
-import numpy as np
+from matchinformation import get_gks
 
 def create_team_df(path, team_id):
     print('')
@@ -12,7 +12,6 @@ def create_team_df(path, team_id):
     team_df=pd.DataFrame()
 
     player_columns=["X","Y","N"]
-    player_positions=[]
     person_ids=[]
     print('')
     print('Aktueller Fortschritt:')
@@ -37,6 +36,13 @@ def create_team_df(path, team_id):
         team_df=pd.concat([team_df, df],axis=1,sort=False)
 
     print('Team Dataframe erstellt.')
+    return team_df
+
+def exclude_gks(team_df,path):
+    gk_ids = get_gks(path)
+    for gk in gk_ids:
+        if gk in team_df.columns:
+            team_df.drop(columns=[gk], level=0, inplace=True)
     return team_df
 
     """

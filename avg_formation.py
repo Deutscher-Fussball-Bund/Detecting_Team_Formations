@@ -1,146 +1,66 @@
-import os.path
 import numpy as np
 
-from tacticon.RawEventDataReader import RawEventDataReader
-from tacticon.Player import Player
-from matchinformation import get_shitnumbers, get_gks
+def get_substitutions(team_df, halftime):
+    #Auswechslung erkennen
+    substitutions = {}
+    for player in team_df.columns:
+        player_isnull=team_df[player].isnull()
+        if player_isnull.values.any():
+            if team_df[player_isnull].index[0]==halftime[0]:
+                if team_df[player_isnull].index[-1] not in substitutions.keys():
+                    substitutions[team_df[player_isnull].index[-1]] = {}
+                substitutions[team_df[player_isnull].index[-1]]['on'] = player[0]
+            if team_df[player_isnull].index[-1]==halftime[3]:
+                if team_df[player_isnull].index[0]-1 not in substitutions.keys():
+                    substitutions[team_df[player_isnull].index[0]-1] = {}
+                substitutions[team_df[player_isnull].index[0]-1]['off'] = player[0]        
+    return substitutions
 
-def get_avg_formations(team_df, seconds):
+def get_halftime(team_df):
     """
-    Berechnet die durchschnittliche Formation einer Mannschaft in einer gegebenen Zeitspanne.
-
-    Argumente:
-        path: Dateipfad zur XML-Datei die benutzt wird.
-        first_frame: Beginn der Zeitspanne.
-        last_frame: Ende der Zeitspanne.
-        team_id: ID der Mannschaft die betrachtet werden soll.
+    Gibt den ersten und letzten Frame einer Halbzeit zurück.
     """
+    halftime=[]
+    for half in team_df.groupby(team_df.index.to_series().diff().ne(1).cumsum()).groups:
+        halftime.append(team_df.groupby(team_df.index.to_series().diff().ne(1).cumsum()).groups[half][0])
+        halftime.append(team_df.groupby(team_df.index.to_series().diff().ne(1).cumsum()).groups[half][-1])
+    return halftime
 
-    player_columns=["X","Y","D","A","S","M","T","N"]
-    #Unbedingt bessere Lösung!!
-    path=os.path.dirname(__file__) + '/../Data_STS/DFL_01_05_masterdata_DFL-CLU-000N99_DFL-SEA-0001K4_player.xml'
-    gk_ids = get_gks(path)
+def get_formation(team_df,ff,lf,invert):
+    k=0
+    formation=[]
+    while k<len(team_df[ff:lf].mean(skipna = True)):
+        if np.isnan(team_df.loc[ff][k]):
+            k+=2
+            continue
+        formation.append([round(team_df[ff:lf].mean(skipna = True)[k],2)*invert,round(team_df[ff:lf].mean(skipna = True)[k+1],2)*invert])
+        k+=2
+    return formation
 
-    player_positions=[]
-    person_ids=[]
-    #Da eine Sekunde aus 25 Frames besteht
-    time_intervall *= 25
-    print('Aktueller Fortschritt:')
-    for frameset in event_data.xml_root.iter('FrameSet'):
-        #Prüft ob der Spieler im richtigen Team ist und ob er schon betrachtet worden ist
-        #Spieler können zweimal im Datensatz vorkommen, da es für erste und zweite Halbzeit FrameSets gibt
-        if frameset.get('TeamId') != team_id:continue
-        if (frameset.get('PersonId') in gk_ids):continue
-        if (frameset.get('PersonId') in person_ids):continue
-
-        print(frameset.get('PersonId'))
-        person_ids.append(frameset.get('PersonId'))
-
-        #Erstellt Player DataFrame und prüft, ob er Spieler im gegebenen Zeitintervall auf dem Feld stand
-        player_df = event_data.create_player_dataframe(player_columns, frameset.get('PersonId'))
-        first_frame,last_frame = get_time_frames(player_df)
-        ff, lf, abort = check_subs(player_df, first_frame, last_frame)
-        if(abort):continue
-
-        x_pos,y_pos=[],[]
+def get_avg_formations(team_df,frames):
+    halftimes=get_halftime(team_df)
+    substitutions=get_substitutions(team_df,halftimes)
+    formations=[]
+    i = halftimes[0]
+    while i<halftimes[1]:
+        j=i+frames
+        if j>halftimes[1]:j=halftimes[1]
+        for substitution in substitutions:
+            if substitution>i and substitution<j:
+                j=substitution
         
-        ff=int(ff)
-        lf=int(lf)
-        for i in range(ff, lf+1, time_intervall):
-            print('hier: i, ff, lf, time_intervall', i,ff,lf,time_intervall)       
-            #Durchschnittliche X- und Y-Position für Spieler wird berechnet
-            x_pos.append(Player(player_df, ff).meanFL('X', i,i + time_intervall))
-            y_pos.append(Player(player_df, ff).meanFL('Y', i,i + time_intervall))
-
-        player_positions.append([x_pos, y_pos])
-
-    #Muss noch dynamisch gesetzt werden
-    path=os.path.dirname(__file__) + '/../Data_STS/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-X03BWS.xml'
-    shirtnumbers=get_shitnumbers(person_ids,path)
-    print('Alle Spieler wurden geladen.')
-    return player_positions, shirtnumbers
-
-
-
-def get_avg_formation(event_data, team_id):
-    """
-    Berechnet die durchschnittliche Formation einer Mannschaft in einer gegebenen Zeitspanne.
-
-    Argumente:
-        path: Dateipfad zur XML-Datei die benutzt wird.
-        first_frame: Beginn der Zeitspanne.
-        last_frame: Ende der Zeitspanne.
-        team_id: ID der Mannschaft die betrachtet werden soll.
-    """
-
-    #Unbedingt bessere Lösung!!
-    path=os.path.dirname(__file__) + '/../Data_STS/DFL_01_05_masterdata_DFL-CLU-000N99_DFL-SEA-0001K4_player.xml'
-    gk_ids = get_gks(path)
-
-    player_positions=[]
-    person_ids=[]
-    print('Aktueller Fortschritt:')
-    for frameset in event_data.xml_root.iter('FrameSet'):
-        #Prüft ob der Spieler im richtigen Team ist und ob er schon betrachtet worden ist
-        #Spieler können zweimal im Datensatz vorkommen, da es für erste und zweite Halbzeit FrameSets gibt
-        if frameset.get('TeamId') != team_id:continue
-        if (frameset.get('PersonId') in gk_ids):continue
-        if (frameset.get('PersonId') in person_ids):continue
-
-        print(frameset.get('PersonId'))
-        person_ids.append(frameset.get('PersonId'))
-
-        #Erstellt Player DataFrame und prüft, ob er Spieler im gegebenen Zeitintervall auf dem Feld stand
-        player_df = event_data.create_player_dataframe(player_columns, frameset.get('PersonId'))
-        first_frame,last_frame = get_time_frames(player_df)
-        ff, lf, abort = check_subs(player_df, first_frame, last_frame)
-        if(abort):continue
-
-        #Durchschnittliche X- und Y-Position für Spieler wird berechnet
-        #x_pos,y_pos=[],[]
-        x_pos=Player(player_df, ff).meanFL('X', ff, lf)
-        y_pos=Player(player_df, ff).meanFL('Y', ff, lf)
-
-        player_positions.append([x_pos, y_pos])
-
-    #Muss noch dynamisch gesetzt werden
-    path=os.path.dirname(__file__) + '/../Data_STS/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-X03BWS.xml'
-    shirtnumbers=get_shitnumbers(person_ids,path)
-    print('Alle Spieler wurden geladen.')
-    return player_positions, shirtnumbers
-
-def get_time_frames(player_df):
-    first_frame = player_df['N'][0]
-    last_frame = player_df['N'].iloc[-1]
-    return first_frame, last_frame
-
-def check_subs(player_df, first_frame, last_frame):
-    """
-    Prüft, ob der Spieler in dem angegebenen Zeitintervall auf dem Feld war.
-
-    Argumente:
-        player_df: Datenframe des Spielers.
-        first_frame: Beginn der Zeitspanne.
-        last_frame: Ende der Zeitspanne.
-    """
-    FIRST_FRAME = player_df['N'][0]
-    LAST_FRAME = player_df['N'].iloc[-1]
-
-    if(LAST_FRAME < first_frame):
-        print('Player was substituted before the time interval.')
-        return first_frame, last_frame, True
-    if(FIRST_FRAME > last_frame):
-        print('Player was substituted after the time interval.')
-        return first_frame, last_frame, True
-    if(FIRST_FRAME < first_frame):
-        if(LAST_FRAME < last_frame):
-            print('Player was substituted in the time interval. Last frame: ' + str(LAST_FRAME))
-            return first_frame, LAST_FRAME, False
-    if(FIRST_FRAME > first_frame):
-        if(LAST_FRAME < last_frame):
-            print('Player was substituted in the time interval twice. First frame: ' + str(FIRST_FRAME) + 'Last frame: ' + str(LAST_FRAME))
-            return FIRST_FRAME, LAST_FRAME, False
-        print('Player was substituted in the time interval. First frame: ' + str(FIRST_FRAME))
-        return FIRST_FRAME, last_frame, False
-    #Default
-    return first_frame, last_frame, False
+        formations.append(get_formation(team_df,i,j,1))
+        i=j+1
+    
+    i = halftimes[2]
+    while i<halftimes[3]:
+        j=i+frames
+        if j>halftimes[3]:j=halftimes[3]
+        for substitution in substitutions:
+            if substitution>i and substitution<j:
+                j=substitution
+        
+        formations.append(get_formation(team_df,i,j,-1))
+        i=j+1
+    
+    return formations
