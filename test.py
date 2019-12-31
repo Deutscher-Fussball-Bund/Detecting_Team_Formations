@@ -1,7 +1,8 @@
 import os
 import numpy as np
+import pandas as pd
 
-from start_analysis import start_analysis
+from start_analysis import start_analysis,start_clustering
 #from avg_formation import get_gks
 from team import create_team_df
 
@@ -11,6 +12,20 @@ import matplotlib.pyplot as plt
 from tacticon.Pitch import Pitch
 from formations import get_formations
 
+from tacticon.RawEventDataReader import RawEventDataReader
+
+ball_col=["N","BallPossession","BallStatus"]
+'19-06-12_Mainz_GER_EST Sportec Data/DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-003BEU.xml'  #DFL-CLU-000N8Y
+'Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml' #DFL-CLU-000N99
+event_data = RawEventDataReader(os.path.dirname(__file__) + '/../19-06-12_Mainz_GER_EST Sportec Data/DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-003BEU.xml')
+df=start_clustering(os.path.dirname(__file__) + '/../19-06-12_Mainz_GER_EST Sportec Data/DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-003BEU.xml','DFL-CLU-000N8Y')
+
+print(df)
+
+
+
+
+quit()
 
 start_analysis(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml',30,'DFL-CLU-000N99')
 

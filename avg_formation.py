@@ -64,3 +64,38 @@ def get_avg_formations(team_df,frames):
         i=j+1
     
     return formations
+
+def get_avg_formations_by_timeframes(team_df,frames):
+    halftimes=get_halftime(team_df)
+    substitutions=get_substitutions(team_df,halftimes)
+    formations=[]
+
+    i = halftimes[0]
+    while i<halftimes[1]:
+        j=i+frames
+        if j>halftimes[1]:j=halftimes[1]
+        for substitution in substitutions:
+            if substitution>i and substitution<j:
+                j=substitution
+        if team_df[i:j].mean()['Ball']['BallStatus']==1:
+            formations.append(get_formation(team_df,i,j,1))
+        i+=25+1
+    
+    i = halftimes[2]
+    while i<halftimes[3]:
+        j=i+frames
+        if j>halftimes[3]:j=halftimes[3]
+        for substitution in substitutions:
+            if substitution>i and substitution<j:
+                j=substitution
+        if team_df[i:j].mean()['Ball']['BallStatus']==1:
+            formations.append(get_formation(team_df,i,j,1))
+        i+=25+1
+    
+    return formations
+
+
+    #print(df.mean()['Ball']['BallStatus'])
+    #print(df[10000.0:10075.0].mean()['Ball']['BallStatus'])
+    #print(df[170495.0:170499.0].mean()['Ball']['BallStatus'])
+    #print('')

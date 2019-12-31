@@ -2,12 +2,9 @@ from tacticon.RawEventDataReader import RawEventDataReader
 import pandas as pd
 from matchinformation import get_gks
 
-def create_team_df(path, team_id):
+def create_team_df(event_data, team_id):
     print('')
     print('Team Dataframe wird erstellt.')
-    print('XML-Datei wird geladen.')
-    event_data = RawEventDataReader(path)
-    print('XML-Datei geladen.')
 
     team_df=pd.DataFrame()
 
@@ -36,6 +33,19 @@ def create_team_df(path, team_id):
         team_df=pd.concat([team_df, df],axis=1,sort=False)
 
     print('Team Dataframe erstellt.')
+    return team_df
+
+def add_ball_details(event_data,team_df):
+    ball_col=["N","BallPossession","BallStatus"]
+    ball_df=event_data.create_ball_dataframe(ball_col)
+    print(ball_df)
+
+    arrays=[['Ball','Ball'],['BallPossession', 'BallStatus']]
+    tuples=list(zip(*arrays))
+    index=pd.MultiIndex.from_tuples(tuples,names=['', ''])
+    df=pd.DataFrame(ball_df[['BallPossession','BallStatus']].to_numpy(),index=ball_df['N'].to_numpy(),columns=index)
+    team_df=pd.concat([team_df, df],axis=1,sort=False)
+
     return team_df
 
 def exclude_gks(team_df,path):
