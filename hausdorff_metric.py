@@ -52,16 +52,24 @@ def calculate_formation(player_positions):
 
 def calculate_formations(formations):
     print('Standardformation wird geladen und verschoben.')
-    
+    print('Hausdorff-Distanz wird berechnet.')
+    i=1
     for formation in formations:
         team_mean=get_mean(formation)
         def_formations = get_formations()
         formations_moved = move_formation(team_mean,def_formations)
-        print('Hausdorff-Distanz wird berechnet.')
+        
         hd_min=['test',100]
         for key in formations_moved:
             hd = get_hausdorff(formation,formations_moved[key])
             if(hd<hd_min[1]):
                 hd_min=[key,hd]
 
-        print('Ergebnis:', hd_min)
+        print('Ergebnis',i,':', hd_min)
+        Pitch("#195905", "#faf0e6")
+        for player in formation:
+            plt.scatter(player[0], player[1], c='red', zorder=10)
+        for positions in formations_moved[hd_min[0]]:
+            plt.scatter(positions[0], positions[1], c='grey', zorder=10)
+        plt.show()
+        i+=1

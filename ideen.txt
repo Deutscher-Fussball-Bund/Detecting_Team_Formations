@@ -5,3 +5,34 @@ Mögliche Ansätze:
 - Formationen vorgeben und abgleichen wie groß die Abweichung der Mannschaft zu diesen ist.
 
 - Jeder Frame eine Formation. Diese Daten Labeln und Cluster-Algorithmus trainieren.
+
+
+
+
+
+
+
+
+
+App Änderungen
+- Vergleich Formationen
+- Auswahl Ballbesitzt
+- Select Window 1 + 2
+- Plot predicted Formation
+
+DE Bel U21
+De Nordirland Frankfurt
+
+Machine Learning
+- Ballbesitzwechsel erkennen
+- Umschaltmoment +/- 5s
+- Standardsituationen raus / erkennen
+- vergleich unterschiedlicher Durchschnittposiitonen
+
+Clustering k-means
+- Time Frames erstellen
+- 3s wenn ballstatus 0 raus
+
+
+
+

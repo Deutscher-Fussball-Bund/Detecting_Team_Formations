@@ -9,16 +9,19 @@ import matplotlib
 matplotlib.use('TKAgg')
 import matplotlib.pyplot as plt
 from tacticon.Pitch import Pitch
+from formations import get_formations
 
 
-formations=start_analysis(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml',10000,'DFL-CLU-000N99')
+start_analysis(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml',30,'DFL-CLU-000N99')
+
+quit()
+
+formations=get_formations()
 for formation in formations:
-    print('')
     Pitch("#195905", "#faf0e6")
-    for player in formation:
-        print(player)
-        
+    for player in formations[formation]:
         plt.scatter(player[0], player[1], c='red', zorder=10)
+        plt.title(formation)
     plt.show()  
 
 quit()
