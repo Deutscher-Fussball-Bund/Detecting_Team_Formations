@@ -37,6 +37,24 @@ def move_formation(team_mean, formations):
         
     return formations
 
+def move_formations_to_centre_spot(formations):
+    for formation in formations:    
+        x_pos=[]
+        y_pos=[]
+        for player in formation:
+            x_pos.append(player[0])
+            y_pos.append(player[1])
+        
+        array_mean=[mean(x_pos),mean(y_pos)]
+        dif_x=0 - array_mean[0]
+        dif_y=0 - array_mean[1]
+        
+        for player in formation:
+            player[0] += dif_x
+            player[1] += dif_y
+        
+    return formations
+
 ### [[[-21.236895403064622, -4.544330446369087, -3.240826115922718], [-16.881978680879413, -13.246682211858761, 9.312365089940041]]
 ##->[[[-21...,-16..],[...]]] 
 def extract_formations(arr):

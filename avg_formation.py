@@ -37,6 +37,17 @@ def get_formation(team_df,ff,lf,invert):
         k+=2
     return formation
 
+def get_formation_wo_ball(team_df,ff,lf,invert):
+    k=0
+    formation=[]
+    while k<len(team_df[ff:lf].mean(skipna = True))-2:
+        if np.isnan(team_df.loc[ff][k]):
+            k+=2
+            continue
+        formation.append([round(team_df[ff:lf].mean(skipna = True)[k],2)*invert,round(team_df[ff:lf].mean(skipna = True)[k+1],2)*invert])
+        k+=2
+    return formation
+
 def get_avg_formations(team_df,frames):
     halftimes=get_halftime(team_df)
     substitutions=get_substitutions(team_df,halftimes)
@@ -78,7 +89,7 @@ def get_avg_formations_by_timeframes(team_df,frames):
             if substitution>i and substitution<j:
                 j=substitution
         if team_df[i:j].mean()['Ball']['BallStatus']==1:
-            formations.append(get_formation(team_df,i,j,1))
+            formations.append(get_formation_wo_ball(team_df,i,j,1))
         i+=25+1
     
     i = halftimes[2]
@@ -89,7 +100,7 @@ def get_avg_formations_by_timeframes(team_df,frames):
             if substitution>i and substitution<j:
                 j=substitution
         if team_df[i:j].mean()['Ball']['BallStatus']==1:
-            formations.append(get_formation(team_df,i,j,1))
+            formations.append(get_formation_wo_ball(team_df,i,j,-1))
         i+=25+1
     
     return formations
