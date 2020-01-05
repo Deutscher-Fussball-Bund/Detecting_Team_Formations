@@ -20,9 +20,21 @@ def get_gks(path):
     root_matchinformation = matchinformation.getroot()
 
     gk_ids=[]
-    for object in root_matchinformation.iter('Object'):
-            if(object.get('PlayingPositionEnglish')=='goalkeeper'):
-                gk_ids.append(object.get('ObjectId'))
+    for object in root_matchinformation.iter('Player'):
+            if(object.get('PlayingPosition')=='TW'):
+                gk_ids.append(object.get('PersonId'))
 
     print('Torhüter', gk_ids)
     return gk_ids
+
+def get_team_ids(path):
+    #XML wird geladen
+    matchinformation = ET.parse(path)
+    root_matchinformation = matchinformation.getroot()
+
+    team_ids=[]
+    for object in root_matchinformation.iter('Team'):
+        team_ids.append(object.get('TeamId'))
+
+    print('Teams', team_ids)
+    return team_ids

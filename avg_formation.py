@@ -1,4 +1,5 @@
 import numpy as np
+from matchinformation import get_gks
 
 def get_substitutions(team_df, halftime):
     #Auswechslung erkennen
@@ -76,7 +77,7 @@ def get_avg_formations(team_df,frames):
     
     return formations
 
-def get_avg_formations_by_timeframes(team_df,frames):
+def get_avg_formations_by_timeframes(team_df,frames,signs):
     halftimes=get_halftime(team_df)
     substitutions=get_substitutions(team_df,halftimes)
     formations=[]
@@ -89,7 +90,7 @@ def get_avg_formations_by_timeframes(team_df,frames):
             if substitution>i and substitution<j:
                 j=substitution
         if team_df[i:j].mean()['Ball']['BallStatus']==1:
-            formations.append(get_formation_wo_ball(team_df,i,j,1))
+            formations.append(get_formation_wo_ball(team_df,i,j,signs[0]))
         i+=25+1
     
     i = halftimes[2]
@@ -100,7 +101,7 @@ def get_avg_formations_by_timeframes(team_df,frames):
             if substitution>i and substitution<j:
                 j=substitution
         if team_df[i:j].mean()['Ball']['BallStatus']==1:
-            formations.append(get_formation_wo_ball(team_df,i,j,-1))
+            formations.append(get_formation_wo_ball(team_df,i,j,signs[1]))
         i+=25+1
     
     return formations

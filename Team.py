@@ -1,5 +1,6 @@
 from tacticon.RawEventDataReader import RawEventDataReader
 import pandas as pd
+import numpy as np
 from matchinformation import get_gks
 
 def create_team_df(event_data, team_id):
@@ -50,10 +51,16 @@ def add_ball_details(event_data,team_df):
 
 def exclude_gks(team_df,path):
     gk_ids = get_gks(path)
+    signs=np.array([-1,1])
+    try:
+        for gk in gk_ids:
+            signs = signs * np.sign(team_df[gk].iloc[0]['X'])
+    except:
+        None
     for gk in gk_ids:
         if gk in team_df.columns:
             team_df.drop(columns=[gk], level=0, inplace=True)
-    return team_df
+    return team_df,signs
 
     """
     print(team_df.head())
