@@ -39,8 +39,7 @@ def create_team_df(event_data, team_id):
 def add_ball_details(event_data,team_df):
     ball_col=["N","BallPossession","BallStatus"]
     ball_df=event_data.create_ball_dataframe(ball_col)
-    print(ball_df)
-
+    
     arrays=[['Ball','Ball'],['BallPossession', 'BallStatus']]
     tuples=list(zip(*arrays))
     index=pd.MultiIndex.from_tuples(tuples,names=['', ''])

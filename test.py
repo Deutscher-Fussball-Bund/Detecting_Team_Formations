@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from start_analysis import start_analysis,start_clustering_match
+from start_analysis import start_analysis,start_clustering_matches
 #from avg_formation import get_gks
 from team import create_team_df
 
@@ -16,23 +16,33 @@ from tacticon.RawEventDataReader import RawEventDataReader
 from matchinformation import get_gks
 from kmeans import calculate_cluster
 
-#ball_col=["N","BallPossession","BallStatus"]
-#'19-06-12_Mainz_GER_EST Sportec Data/DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-003BEU.xml'  #DFL-CLU-000N8Y
-#'Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml' #DFL-CLU-000N99
-#event_data = RawEventDataReader(os.path.dirname(__file__) + '/../19-06-12_Mainz_GER_EST Sportec Data/DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-003BEU.xml')
-info_path=os.path.dirname(__file__) + '/../Data_STS/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-X03BWS.xml'
-cluster=start_clustering_match(os.path.dirname(__file__) + '/../Data_STS/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml',info_path)#'DFL-CLU-000N9A')#DFL-CLU-000N99
+info_path_GER_EST=os.path.dirname(__file__) + '/../Daten/GER_EST/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-003BEU (1).xml'
+path_GER_EST=os.path.dirname(__file__) + '/../Daten/GER_EST/DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-003BEU.xml'
+
+info_path_GER_NL=os.path.dirname(__file__) + '/../Daten/GER_NL/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-X03BWS.xml' #'DFL-CLU-000N9A')#DFL-CLU-000N99
+path_GER_NL=os.path.dirname(__file__) + '/../Daten/GER_NL/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-X03BWS.xml'
+
+info_path_GER_BEL_U21=os.path.dirname(__file__) + '/../Daten/GER_BEL_U21/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-003BWT.xml'
+path_GER_BEL_U21=os.path.dirname(__file__) + '/../Daten/GER_BEL_U21/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-003BWT.xml'
+
+info_path_GER_NIR=os.path.dirname(__file__) + '/../Daten/GER_NIR/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-003BWS.xml'
+path_GER_NIR=os.path.dirname(__file__) + '/../Daten/GER_NIR/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-003BWS.xml'
+
+
+
+matches=[[path_GER_EST,info_path_GER_EST],[path_GER_NL,info_path_GER_NL],[path_GER_NIR,info_path_GER_NIR],[path_GER_BEL_U21,info_path_GER_BEL_U21]]
+
+cluster=start_clustering_matches(matches)
 print('')
-print(cluster)
+i=1
 for formation in cluster:
     Pitch("#195905", "#faf0e6")
     for player in formation:
         plt.scatter(player[0], player[1], c='red', zorder=10)
         #plt.title(formation)
     plt.show()
-
-
-
+    plt.savefig('Figure_'+str(i)+'.png')
+    i+=1
 
 
 quit()

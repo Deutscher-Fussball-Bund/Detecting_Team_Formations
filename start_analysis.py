@@ -73,3 +73,32 @@ def start_clustering_match(path,info_path):
     
     cluster=calculate_cluster(formations,4)
     return cluster
+
+def start_clustering_matches(matches):
+    print('')
+    formations=[]
+    for match in matches:
+        path=match[0]
+        info_path=match[1]
+        print('Positionsdaten werden geladen.')
+        print('XML-Datei wird geladen.')
+        event_data = RawEventDataReader(path)
+        print('XML-Datei geladen.')
+        
+        team_ids=get_team_ids(info_path)
+        for team_id in team_ids:
+            team_df=create_team_df(event_data,team_id)
+            print('Torhüter werden entfernt.')
+            team_df,signs=exclude_gks(team_df,info_path)
+            print('Ballinformationen werden hinzugefügt.')
+            team_df=add_ball_details(event_data,team_df)
+            print('Sliding Time Windows werden erstellt.')
+            formations+=get_avg_formations_by_timeframes(team_df,75,signs)
+            print('Länge',len(formations))
+
+    print('Formationen normalisieren.')
+    formations=move_formations_to_centre_spot(formations)
+    print('')
+    
+    cluster=calculate_cluster(formations,20)
+    return cluster

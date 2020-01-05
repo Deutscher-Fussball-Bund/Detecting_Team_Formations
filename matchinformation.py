@@ -28,7 +28,6 @@ def get_gks(path):
     return gk_ids
 
 def get_team_ids(path):
-    #XML wird geladen
     matchinformation = ET.parse(path)
     root_matchinformation = matchinformation.getroot()
 
