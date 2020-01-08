@@ -37,3 +37,17 @@ def get_team_ids(path):
 
     print('Teams', team_ids)
     return team_ids
+
+def get_match_id(path):
+    matchinformation = ET.parse(path)
+    root_matchinformation = matchinformation.getroot()
+
+    for object in root_matchinformation.iter('General'):
+        return object.get('MatchId')
+
+def get_match_title(path):
+    matchinformation = ET.parse(path)
+    root_matchinformation = matchinformation.getroot()
+
+    for object in root_matchinformation.iter('General'):
+        return object.get('MatchTitle')
