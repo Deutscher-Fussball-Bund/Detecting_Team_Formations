@@ -1,6 +1,6 @@
-from sklearn.cluster import KMeans
 import numpy as np
 
+from sklearn.cluster import KMeans
 
 def calculate_cluster(formations, n_clusters):
     print('np array wird erstellt.')

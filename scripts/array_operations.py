@@ -1,5 +1,6 @@
-from statistics import mean
 import numpy as np
+
+from statistics import mean
 
 def combine_xy(array, color):
     x_pos=[]

@@ -16,6 +16,27 @@ from tacticon.RawEventDataReader import RawEventDataReader
 from matchinformation import get_gks
 from kmeans import calculate_cluster
 
+import xml.etree.ElementTree as ET
+
+
+
+def get_starting_goalkeeper(path):
+    matchinformation = ET.parse(path)
+    root_matchinformation = matchinformation.getroot()
+    player_ids=[]
+
+    for team in root_matchinformation.iter('Team'):
+        for players in team:
+            for player in players:
+                if player.get('PlayingPosition')=='TW' and player.get('Starting')=="true":
+                    player_ids.append([team.get('TeamId'),player.get('PersonId')])
+
+    return player_ids
+
+
+
+
+
 info_path_GER_EST=os.path.dirname(__file__) + '/../Daten/GER_EST/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-003BEU (1).xml'
 path_GER_EST=os.path.dirname(__file__) + '/../Daten/GER_EST/DFL_04_03_positions_raw_observed_DFL-COM-000001_DFL-MAT-003BEU.xml'
 
@@ -28,7 +49,8 @@ path_GER_BEL_U21=os.path.dirname(__file__) + '/../Daten/GER_BEL_U21/DFL_04_02_po
 info_path_GER_NIR=os.path.dirname(__file__) + '/../Daten/GER_NIR/DFL_02_01_matchinformation_DFL-COM-000001_DFL-MAT-003BWS.xml'
 path_GER_NIR=os.path.dirname(__file__) + '/../Daten/GER_NIR/DFL_04_02_positions_raw_DFL-COM-000001_DFL-MAT-003BWS.xml'
 
-
+print(get_starting_goalkeeper(info_path_GER_BEL_U21))
+quit()
 
 matches=[[path_GER_EST,info_path_GER_EST],[path_GER_NL,info_path_GER_NL],[path_GER_NIR,info_path_GER_NIR],[path_GER_BEL_U21,info_path_GER_BEL_U21]]
 

@@ -1,12 +1,12 @@
 import os
-from tacticon.RawEventDataReader import RawEventDataReader
+from scripts.tacticon.RawEventDataReader import RawEventDataReader
 
-from hausdorff_metric import calculate_formation,calculate_formations
-from team import create_team_df,exclude_gks,add_ball_details
-from avg_formation import get_avg_formations,get_avg_formations_by_timeframes
-from kmeans import calculate_cluster
-from array_operations import move_formations_to_centre_spot
-from matchinformation import get_team_ids
+from scripts.hausdorff_metric import calculate_formation,calculate_formations
+from scripts.team import create_team_df,exclude_gks,add_ball_details
+from scripts.avg_formation import get_avg_formations,get_avg_formations_by_timeframes
+from scripts.kmeans import calculate_cluster
+from scripts.array_operations import move_formations_to_centre_spot
+from scripts.matchinformation import get_team_ids
 
 def start_analysis(path, time_intervall, team_id):
     """

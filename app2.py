@@ -102,3 +102,88 @@ def display_files(fileNames):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
+    app.layout = html.Div(
+    dcc.Tabs(id="tabs", value='tab-1', children=[
+        dcc.Tab(label='Tab one', value='tab-1'),
+        dcc.Tab(label='Tab two', value='tab-2'),
+    ]),
+    html.Div(
+        id='tabs-content',
+        children=[
+            # Banner
+            html.Div(
+                id="banner",
+                className="banner",
+                children=[html.Img(src=app.get_asset_url("DFB-Logo.png")),
+                            html.Img(src=app.get_asset_url("Uni-Logo.png")),
+                            html.Img(src=app.get_asset_url("ISS-Logo.png"))],
+            ),
+            html.Div([
+                dash_resumable_upload.Upload(
+                    id='upload',
+                    maxFiles=1,
+                    maxFileSize=1024*1024*1000,  # 100 MB
+                    service="/upload_resumable",
+                    #textLabel="Drag and Drop Here to upload!",
+                    startButton=False,
+                    pauseButton=False,
+                    cancelButton=False,
+                    children=html.Div([
+                        'Drag and Drop or ',
+                        html.A('Select Files')
+                    ]),
+                    defaultStyle={
+                        'width': '100%',
+                        'height': '60px',
+                        'lineHeight': '60px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'dashed',
+                        'borderRadius': '5px',
+                        'textAlign': 'center',
+                        'margin': '10px'
+                    },
+                    activeStyle={
+                        'width': '100%',
+                        'height': '60px',
+                        'lineHeight': '60px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'solid',
+                        'borderRadius': '5px',
+                        'textAlign': 'center',
+                        'margin': '10px'
+                    },
+                    # Allow multiple files to be uploaded
+                    #multiple=True
+                )
+            ]),
+            # Left column
+            html.Div(
+                id="left-column",
+                className="four columns",
+                children=[description_card(), generate_control_card()]
+                + [
+                    html.Div(
+                        ["initial child"], id="output-clientside", style={"display": "none"}
+                    )
+                ],
+            ),
+            # Right column
+            html.Div(
+                id="right-column",
+                className="eight columns",
+                children=[
+                    # Patient Volume Heatmap
+                    html.Div(
+                        id="football pitch",
+                        children=[
+                            html.B("Game Situation"),
+                            html.Hr(),
+                            html.Img(id='pitch')
+                        ],
+                    )
+                ],
+            )
+        ]
+    )
+)
