@@ -38,16 +38,38 @@ def get_team_ids(path):
     print('Teams', team_ids)
     return team_ids
 
-def get_match_id(path):
-    matchinformation = ET.parse(path)
-    root_matchinformation = matchinformation.getroot()
+def get_match_id(info_string):
+    root_matchinformation = ET.fromstring(info_string)
+    #root_matchinformation = matchinformation.getroot()
 
     for object in root_matchinformation.iter('General'):
         return object.get('MatchId')
 
-def get_match_title(path):
+def get_match_id_from_position(path):
     matchinformation = ET.parse(path)
     root_matchinformation = matchinformation.getroot()
 
+    for object in root_matchinformation.iter('MetaData'):
+        return object.get('MatchId')
+
+def get_match_title(info_string):
+    root_matchinformation = ET.fromstring(info_string)
+    #root_matchinformation = matchinformation.getroot()
+
     for object in root_matchinformation.iter('General'):
         return object.get('MatchTitle')
+
+def get_matchinformation(path):
+    matchinformation = ET.parse(path)
+    root_matchinformation = matchinformation.getroot()
+    information=[]
+    for object in root_matchinformation.iter('General'):
+        information.append(object.get('Season'))
+        information.append(object.get('PlannedKickoffTime').split('T')[0])
+        information.append(object.get('MatchId'))
+        information.append(object.get('HomeTeamName'))
+        information.append(object.get('GuestTeamName'))
+        information.append(object.get('Result'))
+    for object in root_matchinformation.iter('Environment'):
+        information.append(object.get('StadiumName'))
+    return information

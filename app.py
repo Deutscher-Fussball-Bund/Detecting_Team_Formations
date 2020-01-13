@@ -6,14 +6,16 @@ import dash
 import dash_resumable_upload
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 
-from scripts.start_analysis import start_analysis
-from scripts.tacticon.Pitch import Pitch
 
 from dashboard.tab_one import create_tab_one
-from dashboard.tab_two import create_tab_two
-from dashboard.file_management import new_match
+from dashboard.tab_two import create_tab_two,create_second_upload
+from dashboard.file_management import new_match,move_match
+
+
+from dashboard.scripts.start_analysis import start_analysis
+from dashboard.scripts.tacticon.Pitch import Pitch
 
 import matplotlib
 matplotlib.use('TKAgg')
@@ -52,10 +54,24 @@ def render_content(tab):
     
 
 @app.callback(Output('another-column', 'children'),
-                [Input('upload', 'fileNames')])
-def display_files(fileNames):
+                [Input('upload_matchinfo', 'contents')],
+                [State('upload_matchinfo', 'filename')])
+                #[Input('upload_matchinfo', 'fileNames')])
+def upload_matchinfo(contents,filename):
+    if contents is not None:
+       return create_second_upload(new_match(filename, contents))
+
+@app.callback(Output('yet-another-column', 'children'),
+                [Input('upload_position', 'fileNames')])
+def upload_positions(fileNames):
     if fileNames is not None:
-        new_match(fileNames)
+        print('')
+        print('!')
+        print('')
+        move_match(fileNames)
+        print(fileNames)
+        fileNames=None
+        print(fileNames)
 
 if __name__ == '__main__':
     app.run_server(debug=True)
