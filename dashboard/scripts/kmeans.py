@@ -9,6 +9,7 @@ def calculate_cluster(formations, n_clusters):
     nsamples, nx, ny = X.shape
     print(nsamples,nx,ny)
     d2_train_dataset = X.reshape((nsamples,nx*ny))
+    return d2_train_dataset
     print('fitting')
     kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(d2_train_dataset)
     #print(kmeans.labels_)

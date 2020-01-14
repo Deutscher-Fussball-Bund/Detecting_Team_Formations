@@ -1,6 +1,6 @@
 import numpy as np
 
-from dashboard.scripts.matchinformation import get_gks
+from matchinformation import get_gks
 
 def get_substitutions(team_df, halftime):
     #Auswechslung erkennen

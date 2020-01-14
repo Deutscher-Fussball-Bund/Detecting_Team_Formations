@@ -6,9 +6,9 @@ import itertools
 
 from hausdorff import hausdorff_distance
 
-from dashboard.scripts.tacticon.Pitch import Pitch
-from dashboard.scripts.array_operations import combine_xy, get_mean, move_formation
-from dashboard.scripts.formations import get_formations
+from tacticon.Pitch import Pitch
+from array_operations import combine_xy, get_mean, move_formation
+from formations import get_formations
     
 #    hd=hausdorff_distance(team, formation, distance="euclidean")
 #    print(hd)

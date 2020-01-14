@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from dashboard.scripts.tacticon.RawEventDataReader import RawEventDataReader
-from dashboard.scripts.matchinformation import get_gks
+from tacticon.RawEventDataReader import RawEventDataReader
+from matchinformation import get_gks
 
 def create_team_df(event_data, team_id):
     print('')
