@@ -4,7 +4,7 @@ import base64
 import numpy as np
 import pandas as pd
 
-from dashboard.scripts.matchinformation import get_match_id,get_match_title,get_match_id_from_position,get_matchinformation,get_opponents,extend_matchinfo_dic
+from dashboard.scripts.matchinformation import get_match_id,get_match_title,get_match_id_from_position,get_matchinformation,get_matches,get_teams,extend_matchinfo_dic,delete_row
 
 
 def new_match(fileName, contents):
@@ -56,4 +56,11 @@ def create_match_table():
     return df
 
 def get_match_list():
-    return get_opponents()
+    return get_matches()
+
+def get_team_list(match_id):
+    return get_teams(match_id)
+
+def delete_selected_rows(selected_rows):
+    for row_id in selected_rows:
+        delete_row(row_id)

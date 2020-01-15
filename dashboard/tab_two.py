@@ -1,21 +1,21 @@
 import pandas as pd
 
 import dash
-import dash_resumable_upload
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_table
 
 from dash.dependencies import Input, Output
 
-from dashboard.file_management import create_match_table
+from dashboard.file_management import create_match_table,get_match_list
 
 def create_tab_two():
     left_column=create_left_column()
     right_column=create_right_column()
     return html.Div([
-            left_column,
-            right_column    
+            html.Div(left_column,id='left_column'),
+            html.Div(right_column,id='right_column')    
         ])
 
 def create_left_column():
@@ -64,6 +64,8 @@ def create_right_column():
                     data=df.to_dict('records'),
                     columns=[{'id': c, 'name': c, 'hideable':True} for c in df.columns],
 
+                    row_selectable='multi',
+
                     sort_action='native',
                     sort_mode='multi',
 
@@ -85,7 +87,8 @@ def create_right_column():
                             'textAlign': 'left'
                         } for c in ['HomeTeam', 'GuestTeam']
                     ]
-                ) 
+                ),
+                html.Button('Delete Selected Rows', id='button')
             ]
         )
 

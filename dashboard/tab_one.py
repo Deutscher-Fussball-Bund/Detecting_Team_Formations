@@ -1,9 +1,10 @@
 import dash
 import dash_core_components as dcc
+import dash_daq as daq
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-from dashboard.file_management import get_match_list
+from dashboard.file_management import get_match_list,get_team_list
 
 team_list=['Deutschland','Niederlande']
 
@@ -31,7 +32,8 @@ def create_tab_one():
                         children=[
                             html.B("Game Situation"),
                             html.Hr(),
-                            html.Img(id='pitch')
+                            html.Img(id='pitch'),
+                            html.Div(id='gr')
                         ],
                     )
                 ]
@@ -65,13 +67,14 @@ def generate_match_card():
     return html.Div(
         id="match-card",
         children=[
+            html.Br(),
             html.P("Select Match"),
             dcc.Dropdown(
                 id="match-select",
                 options=[{"label": i[0], "value": i[1]} for i in match_list],
                 style = dict(width = '15em')
             ),
-            html.Div(id="match-settings")
+            html.Div(id="match-controls")
         ]
     )
 
@@ -80,36 +83,67 @@ def add_match_controls(match_id):
     """
     :return: A Div containing controls for graphs.
     """
+    team_list=get_team_list(match_id)
     return html.Div(
         id="control-card",
         children=[
+            html.Br(),
+            html.Br(),
             html.P("Select Team"),
             dcc.Dropdown(
                 id="team-select",
-                options=[{"label": i, "value": i} for i in team_list],
-                value=team_list[0],
+                options=[{"label": i[0], "value": i[1]} for i in team_list],
+                style = dict(width = '20em')
             ),
+            html.Div(id='match-settings')
+        ]
+    )
+
+def add_match_settings():
+    return html.Div(
+        children=[
             html.Br(),
             html.P("Select Time Window"),
             dcc.RangeSlider(
+                id='slider-window',
                 count=1,
                 min=0,
                 max=90,
                 step=1,
                 value=[0, 90]
-            ),  
+            ),
+            html.Div(id='slider-output-container'),
+            html.Br(),
+            html.P("Select Time Frame Size"),
+            daq.NumericInput(
+                id='time-input',
+                min=0,
+                value=10,
+                max=120
+            ),
             html.Br(),
             html.Br(),
-            html.P("Select Time Frame"),
-            dcc.Input(
-                placeholder='Enter a value...',
-                type='text',
-                value=''
-            ),  
+            html.P("Ball Possession Phase"),
+            dcc.RadioItems(
+                id='possession-radio',
+                options=[
+                    {'label': 'Ball possession', 'value': 'bp'},
+                    {'label': 'No ball possession', 'value': 'npb'},
+                    {'label': 'Both', 'value': 'bo'}
+                ],
+                value='bo'
+            ),
+            html.Br(),
+            html.P(id='ex_secs',children=['Exclude Seconds After Possession Change']),
+            daq.Knob(
+                id='knob',
+                value=3
+            ),
             html.Br(),
             html.Div(
-                id="reset-btn-outer",
-                children=html.Button(id="reset-btn", children="Reset", n_clicks=0),
+                id="start-btn-outer",
+                children=html.Button(id="start-btn", children="Go"),
             ),
-        ],
+            html.Br()
+        ]
     )

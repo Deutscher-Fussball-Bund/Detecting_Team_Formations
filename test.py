@@ -8,6 +8,12 @@ dirname=os.path.dirname(__file__)
 path=os.path.join(dirname, '../uploads/')
 matchinfo_dic= pickle.load( open( path+"matches.p", "rb" ) )
 print(matchinfo_dic)
+print(matchinfo_dic.keys())
+for key in matchinfo_dic.keys():
+    print(key)
+print(list(matchinfo_dic)[1])
+print(list(matchinfo_dic)[0][0])
+quit()
 del matchinfo_dic['Test_Id']
 print(matchinfo_dic)
 """
@@ -19,7 +25,7 @@ matchinfo_dic['Test_Id']['Title']='Dummy Value'
 matchinfo_dic['Test_Id']['Result']='Dummy Value'
 matchinfo_dic['Test_Id']['StadiumName']='Dummy Value'
 """
-pickle.dump(matchinfo_dic, open( path+"matches.p", "wb" ) )
+#pickle.dump(matchinfo_dic, open( path+"matches.p", "wb" ) )
 
 
 quit()

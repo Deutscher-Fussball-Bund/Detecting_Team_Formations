@@ -78,7 +78,7 @@ def get_matchinformation():
         information.append(match)
     return information
 
-def get_opponents():
+def get_matches():
     matchinfo_dic=pickle.load( open(dic_path, "rb" ) )
     information=[]
     for match_id in matchinfo_dic:
@@ -86,6 +86,13 @@ def get_opponents():
         match.append(matchinfo_dic[match_id]['Title'])
         match.append(match_id)
         information.append(match)
+    return information
+
+def get_teams(match_id):
+    matchinfo_dic=pickle.load( open(dic_path, "rb" ) )
+    information=[]
+    information.append([matchinfo_dic[match_id]['HomeTeamName'],matchinfo_dic[match_id]['HomeTeamId']])
+    information.append([matchinfo_dic[match_id]['GuestTeamName'],matchinfo_dic[match_id]['GuestTeamId']])
     return information
 
 def extend_matchinfo_dic(path):
@@ -107,4 +114,13 @@ def extend_matchinfo_dic(path):
     for object in root_matchinformation.iter('Environment'):
         matchinfo_dic[match_id]['StadiumName']=object.get('StadiumName')
     
+    for object in root_matchinformation.iter('Team'):
+        if object.get('TeamName')==matchinfo_dic[match_id]['HomeTeamName']:matchinfo_dic[match_id]['HomeTeamId']=object.get('TeamId')
+        else: matchinfo_dic[match_id]['GuestTeamId']=object.get('TeamId')
+    
+    pickle.dump(matchinfo_dic,open(dic_path,'wb'))
+
+def delete_row(row_id):
+    matchinfo_dic=pickle.load(open(dic_path,'rb'))
+    del matchinfo_dic[list(matchinfo_dic)[row_id]]
     pickle.dump(matchinfo_dic,open(dic_path,'wb'))
