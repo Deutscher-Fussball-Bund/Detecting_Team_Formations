@@ -3,7 +3,7 @@ from tacticon.RawEventDataReader import RawEventDataReader
 
 from hausdorff_metric import calculate_formation,calculate_formations
 from team import create_team_df,exclude_gks,add_ball_details
-from avg_formation import get_avg_formations,get_avg_formations_by_timeframes
+from avg_formation import get_avg_formations,get_avg_formations_by_timeframes,get_avg_formations_by_timeframes_old,get_avg_formations_by_timeframes_and_possession
 from kmeans import calculate_cluster
 from array_operations import move_formations_to_centre_spot
 from matchinformation import get_team_ids
@@ -42,13 +42,18 @@ def start_clustering_team(path,info_path,team_id):
     print('Ballinformationen werden hinzugefügt.')
     team_df=add_ball_details(event_data,team_df)
     print('Sliding Time Windows werden erstellt.')
-    formations=get_avg_formations_by_timeframes(team_df,75,signs)
+    formations_old=get_avg_formations_by_timeframes_old(team_df,75,signs)
+    print('Old fertig.')
+    formations_new=get_avg_formations_by_timeframes(team_df,75,signs)
+    print('New fertig.')
     print('Formationen normalisieren.')
-    formations=move_formations_to_centre_spot(formations)
+    formations_old=move_formations_to_centre_spot(formations_old)
+    formations_new=move_formations_to_centre_spot(formations_new)
     print('')
-    
-    cluster=calculate_cluster(formations,4)
-    return cluster
+      
+    cluster_old=calculate_cluster(formations_old,10)
+    cluster_new=calculate_cluster(formations_new,10)
+    return [cluster_old,cluster_new]
 
 def start_clustering_match(path,info_path):
     print('')
@@ -93,7 +98,7 @@ def start_clustering_matches(matches):
             print('Ballinformationen werden hinzugefügt.')
             team_df=add_ball_details(event_data,team_df)
             print('Sliding Time Windows werden erstellt.')
-            formations+=get_avg_formations_by_timeframes(team_df,75,signs)
+            formations+=get_avg_formations_by_timeframes2(team_df,75,signs,1)
             print('Länge',len(formations))
 
     print('Formationen normalisieren.')

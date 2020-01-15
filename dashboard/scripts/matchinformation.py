@@ -1,4 +1,8 @@
+import os
+import pickle
 import xml.etree.ElementTree as ET
+
+dic_path=os.path.join(os.path.dirname(__file__), '../../../uploads/matches.p')
 
 def get_shitnumbers(person_ids, path):
     # XML wird geladen
@@ -59,17 +63,48 @@ def get_match_title(info_string):
     for object in root_matchinformation.iter('General'):
         return object.get('MatchTitle')
 
-def get_matchinformation(path):
+def get_matchinformation():
+    matchinfo_dic=pickle.load( open(dic_path, "rb" ) )
+    information=[]
+    for match_id in matchinfo_dic:
+        match=[]
+        match.append(matchinfo_dic[match_id]['Season'])
+        match.append(matchinfo_dic[match_id]['PlannedKickoffTime'].split('T')[0])
+        match.append(match_id)
+        match.append(matchinfo_dic[match_id]['HomeTeamName'])
+        match.append(matchinfo_dic[match_id]['GuestTeamName'])
+        match.append(matchinfo_dic[match_id]['Result'])
+        match.append(matchinfo_dic[match_id]['StadiumName'])
+        information.append(match)
+    return information
+
+def get_opponents():
+    matchinfo_dic=pickle.load( open(dic_path, "rb" ) )
+    information=[]
+    for match_id in matchinfo_dic:
+        match=[]
+        match.append(matchinfo_dic[match_id]['Title'])
+        match.append(match_id)
+        information.append(match)
+    return information
+
+def extend_matchinfo_dic(path):
     matchinformation = ET.parse(path)
     root_matchinformation = matchinformation.getroot()
-    information=[]
+
+    matchinfo_dic=pickle.load(open(dic_path,'rb'))
+
+    match_id=''
     for object in root_matchinformation.iter('General'):
-        information.append(object.get('Season'))
-        information.append(object.get('PlannedKickoffTime').split('T')[0])
-        information.append(object.get('MatchId'))
-        information.append(object.get('HomeTeamName'))
-        information.append(object.get('GuestTeamName'))
-        information.append(object.get('Result'))
+        match_id=object.get('MatchId')
+        matchinfo_dic[match_id]={}
+        matchinfo_dic[match_id]['Season']=object.get('Season')
+        matchinfo_dic[match_id]['PlannedKickoffTime']=object.get('PlannedKickoffTime').split('T')[0]
+        matchinfo_dic[match_id]['HomeTeamName']=object.get('HomeTeamName')
+        matchinfo_dic[match_id]['GuestTeamName']=object.get('GuestTeamName')
+        matchinfo_dic[match_id]['Title']=object.get('HomeTeamName').replace('Nationalmannschaft','')+'- '+object.get('GuestTeamName').replace(' Nationalmannschaft','')
+        matchinfo_dic[match_id]['Result']=object.get('Result')
     for object in root_matchinformation.iter('Environment'):
-        information.append(object.get('StadiumName'))
-    return information
+        matchinfo_dic[match_id]['StadiumName']=object.get('StadiumName')
+    
+    pickle.dump(matchinfo_dic,open(dic_path,'wb'))

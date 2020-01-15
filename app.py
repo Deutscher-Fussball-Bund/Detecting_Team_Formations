@@ -8,18 +8,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
-
-from dashboard.tab_one import create_tab_one
+from dashboard.tab_one import create_tab_one,add_match_controls
 from dashboard.tab_two import create_tab_two,create_second_upload
 from dashboard.file_management import new_match,move_match
 
-
-from dashboard.scripts.start_analysis import start_analysis
-from dashboard.scripts.tacticon.Pitch import Pitch
-
-import matplotlib
-matplotlib.use('TKAgg')
-import matplotlib.pyplot as plt
 
 app = dash.Dash(
     __name__,
@@ -61,17 +53,20 @@ def upload_matchinfo(contents,filename):
     if contents is not None:
        return create_second_upload(new_match(filename, contents))
 
+
 @app.callback(Output('yet-another-column', 'children'),
                 [Input('upload_position', 'fileNames')])
 def upload_positions(fileNames):
     if fileNames is not None:
-        print('')
-        print('!')
-        print('')
         move_match(fileNames)
-        print(fileNames)
-        fileNames=None
-        print(fileNames)
+
+
+@app.callback(Output('match-settings', 'children'),
+                [Input('match-select','value')])
+def match_selected(value):
+    if value is not None:
+        print(value)
+        add_match_controls(value)
 
 if __name__ == '__main__':
     app.run_server(debug=True)

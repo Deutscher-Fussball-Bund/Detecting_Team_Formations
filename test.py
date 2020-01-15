@@ -1,5 +1,30 @@
 from minisom import MiniSom    
-from dashboard.scripts.test import get_formations
+#from dashboard.scripts.test import get_formations
+import pickle
+
+
+import os
+dirname=os.path.dirname(__file__)
+path=os.path.join(dirname, '../uploads/')
+matchinfo_dic= pickle.load( open( path+"matches.p", "rb" ) )
+print(matchinfo_dic)
+del matchinfo_dic['Test_Id']
+print(matchinfo_dic)
+"""
+matchinfo_dic['Test_Id']['Season']='Dummy Value'
+matchinfo_dic['Test_Id']['PlannedKickoffTime']='Dummy Value'
+matchinfo_dic['Test_Id']['HomeTeamName']='Dummy Value'
+matchinfo_dic['Test_Id']['GuestTeamName']='Dummy Value'
+matchinfo_dic['Test_Id']['Title']='Dummy Value'
+matchinfo_dic['Test_Id']['Result']='Dummy Value'
+matchinfo_dic['Test_Id']['StadiumName']='Dummy Value'
+"""
+pickle.dump(matchinfo_dic, open( path+"matches.p", "wb" ) )
+
+
+quit()
+
+
 
 print(get_formations())
 quit()

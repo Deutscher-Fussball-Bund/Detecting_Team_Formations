@@ -78,7 +78,7 @@ def get_avg_formations(team_df,frames):
     
     return formations
 
-def get_avg_formations_by_timeframes(team_df,frames,signs):
+def get_avg_formations_by_timeframes_old(team_df,frames,signs):
     halftimes=get_halftime(team_df)
     substitutions=get_substitutions(team_df,halftimes)
     formations=[]
@@ -105,6 +105,55 @@ def get_avg_formations_by_timeframes(team_df,frames,signs):
             formations.append(get_formation_wo_ball(team_df,i,j,signs[1]))
         i+=25+1
     
+    return formations
+
+def get_avg_formations_by_timeframes(team_df,frames,signs):
+    halftimes=get_halftime(team_df)
+    substitutions=get_substitutions(team_df,halftimes)
+    formations=[]
+    k=0
+    s=0
+    while k < 4:
+        i = halftimes[k]
+        while i<halftimes[k+1]:
+            j=i+frames
+            if j>halftimes[1]:j=halftimes[1]
+            for substitution in substitutions:
+                if substitution>i and substitution<j:
+                    j=substitution
+            if team_df[i:j].mean()['Ball']['BallPossession']>1 and team_df[i:j].mean()['Ball']['BallPossession']<2:
+                i+=75+1 #3 Sekunden werden übersprungen
+                continue
+            if team_df[i:j].mean()['Ball']['BallStatus']==1:
+                formations.append(get_formation_wo_ball(team_df,i,j,signs[s]))
+            i+=25+1
+        k+=2
+        s=1
+    return formations
+
+def get_avg_formations_by_timeframes_and_possession(team_df,frames,signs,possession): #possesion 1/2
+    halftimes=get_halftime(team_df)
+    substitutions=get_substitutions(team_df,halftimes)
+    formations=[]
+    k=0
+    s=0
+    while k < 4:
+        i = halftimes[k]
+        while i<halftimes[k+1]:
+            j=i+frames
+            if j>halftimes[1]:j=halftimes[1]
+            for substitution in substitutions:
+                if substitution>i and substitution<j:
+                    j=substitution
+            if team_df[i:j].mean()['Ball']['BallPossession']>1 and team_df[i:j].mean()['Ball']['BallPossession']<2: #Test, ob es kein Ballbesitzwechsel gab
+                i+=75+1 #3 Sekunden werden übersprungen
+                continue
+            if team_df[i:j].mean()['Ball']['BallStatus']==1: #Test, ob Ball nicht im Aus war
+                if team_df[i:j].mean()['Ball']['BallPossession']==possession: #Test, ob richtige Mannschaft in Ballbesitz war
+                    formations.append(get_formation_wo_ball(team_df,i,j,signs[s]))
+            i+=25+1
+        k+=1
+        s=1
     return formations
 
 

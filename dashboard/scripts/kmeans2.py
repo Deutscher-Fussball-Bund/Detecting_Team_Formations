@@ -26,7 +26,7 @@ def elbow(data):
     plt.show()
 
 def silhouette(data):
-    for i, k in enumerate([12, 13, 14]):
+    for i, k in enumerate([10, 13, 16, 19]):
         fig, (ax1) = plt.subplots(1, 1)
         fig.set_size_inches(18, 7)
         

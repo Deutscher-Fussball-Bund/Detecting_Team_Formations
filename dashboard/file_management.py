@@ -4,7 +4,7 @@ import base64
 import numpy as np
 import pandas as pd
 
-from dashboard.scripts.matchinformation import get_match_id,get_match_title,get_match_id_from_position,get_matchinformation
+from dashboard.scripts.matchinformation import get_match_id,get_match_title,get_match_id_from_position,get_matchinformation,get_opponents,extend_matchinfo_dic
 
 
 def new_match(fileName, contents):
@@ -25,6 +25,7 @@ def new_match(fileName, contents):
     with open(filename, "w") as f:
         f.write(decoded_matchinfo)
     print('Datei verschoben.')
+    extend_matchinfo_dic(filename)
     return match_title
 
 def create_match_folder(path,match_id):
@@ -50,15 +51,9 @@ def move_match(fileNames):
 
 def create_match_table():
     columns = ['Season','Date', 'MatchId', 'HomeTeam', 'GuestTeam', 'Result', 'Stadium']
-    matchinformation=[]
-
-    dirname=os.path.dirname(__file__)
-    path=os.path.join(dirname, '../../uploads/')
-    for dir in os.listdir(path):
-        if dir=='.DS_Store':continue
-        for file in os.listdir(path+dir):
-            if 'matchinformation' in file:
-                matchinformation.append(get_matchinformation(path+dir+'/'+file))
-    data=np.array(matchinformation)
+    data=np.array(get_matchinformation())
     df=pd.DataFrame(data,columns=columns)
     return df
+
+def get_match_list():
+    return get_opponents()

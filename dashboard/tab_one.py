@@ -1,8 +1,9 @@
 import dash
-import dash_resumable_upload
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+
+from dashboard.file_management import get_match_list
 
 team_list=['Deutschland','Niederlande']
 
@@ -12,7 +13,7 @@ def create_tab_one():
             html.Div(
                 id="left-column",
                 className="four columns",
-                children=[description_card(), generate_control_card()]
+                children=[description_card(), generate_match_card()]
                 + [
                     html.Div(
                         ["initial child"], id="output-clientside", style={"display": "none"}
@@ -55,7 +56,27 @@ def description_card():
         ],
     )
 
-def generate_control_card():
+
+def generate_match_card():
+    """
+    :return: A Div containing controls for graphs.
+    """
+    match_list=get_match_list()
+    return html.Div(
+        id="match-card",
+        children=[
+            html.P("Select Match"),
+            dcc.Dropdown(
+                id="match-select",
+                options=[{"label": i[0], "value": i[1]} for i in match_list],
+                style = dict(width = '15em')
+            ),
+            html.Div(id="match-settings")
+        ]
+    )
+
+
+def add_match_controls(match_id):
     """
     :return: A Div containing controls for graphs.
     """
@@ -74,7 +95,7 @@ def generate_control_card():
                 count=1,
                 min=0,
                 max=90,
-                step=0.5,
+                step=1,
                 value=[0, 90]
             ),  
             html.Br(),
