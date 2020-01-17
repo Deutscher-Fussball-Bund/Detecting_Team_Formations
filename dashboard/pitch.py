@@ -17,6 +17,8 @@ def draw_pitch():
         path+=' L '+str(x[k])+','+str(y[k])
     path+=' Z'
 
+
+
     fig = go.Figure()
 
     # Set axes ranges

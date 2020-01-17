@@ -14,6 +14,8 @@ from dashboard.tab_two import create_tab_two,create_second_upload,create_right_c
 from dashboard.file_management import new_match,move_match,delete_selected_rows
 from dashboard.pitch import draw_pitch
 
+import plotly.graph_objects as go
+
 
 app = dash.Dash(
     __name__,
@@ -129,9 +131,15 @@ def check_values(n_clicks,value_team,value_slider,value_frame,value_possession,v
     return show_dummy()
 
 def show_dummy():
+    fig=draw_pitch()
+    fig.add_trace(
+            go.Scatter(
+                x=[-30+11, 30-11],
+                y=[0, 0],
+                mode='markers'
+    ))
     return dcc.Graph(
-        figure=draw_pitch(),
-        #style={'height': 200},
+        figure=fig,
         id='my-graph'
     )  
 
