@@ -30,9 +30,8 @@ def create_tab_one():
                     html.Div(
                         id="football pitch",
                         children=[
+                            html.Br(),
                             html.B("Game Situation"),
-                            html.Hr(),
-                            html.Img(id='pitch'),
                             html.Div(id='gr')
                         ],
                     )
