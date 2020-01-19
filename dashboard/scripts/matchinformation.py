@@ -124,3 +124,11 @@ def delete_row(row_id):
     matchinfo_dic=pickle.load(open(dic_path,'rb'))
     del matchinfo_dic[list(matchinfo_dic)[row_id]]
     pickle.dump(matchinfo_dic,open(dic_path,'wb'))
+
+def indentify_team(match_id,team_id):
+    bp,nbp=1,1
+    matchinfo_dic=pickle.load( open(dic_path, "rb" ) )
+    if team_id==matchinfo_dic[match_id]['HomeTeamId']:nbp=2
+    else:bp=2
+
+    return bp,nbp

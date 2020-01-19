@@ -14,6 +14,8 @@ from dashboard.tab_two import create_tab_two,create_second_upload,create_right_c
 from dashboard.file_management import new_match,move_match,delete_selected_rows
 from dashboard.pitch import draw_pitch
 
+from dashboard.scripts.start_analysis import start_analysis
+
 import plotly.graph_objects as go
 
 
@@ -114,23 +116,48 @@ def make(value):
 
 @app.callback(Output('gr', 'children'),
                 [Input('start-btn', 'n_clicks')],
-                [State('team-select', 'value'),
+                [State('match-select','value'),
+                State('team-select', 'value'),
                 State('slider-window', 'value'),
                 State('time-input', 'value'),
                 State('possession-radio', 'value'),
                 State('knob','value')]
 )
-def check_values(n_clicks,value_team,value_slider,value_frame,value_possession,value_knob):
+def check_values(n_clicks,match_id,team_id,value_slider,time_intervall,possession,sapc):
     if n_clicks is not None:
-        print(n_clicks) #Braucht man nicht
-        print(value_team)
+        dirname=os.path.dirname(__file__)
+        uploads_path=os.path.join(dirname, '../uploads/'+match_id)
+        path=uploads_path+'/positions_raw_'+match_id+'.xml'
+        info_path=uploads_path+'/matchinformation_'+match_id+'.xml'
+        print(match_id)
+        print(team_id)
         print(value_slider) #Immer richtig
-        print(value_frame)
-        print(value_possession)
-        print(value_knob)
+        print(time_intervall)
+        print(possession)
+        print(sapc)
+        #start_analysis(path,info_path,match_id,team_id,time_intervall,possession,value_slider[0],value_slider[1],sapc)
     return show_dummy()
 
 def show_dummy():
+
+    import plotly.figure_factory as ff
+
+    df = [dict(Start='2020-08-01 00:00:00', Finish='2020-08-01 00:02:30', Resource='5-2-3', Task=''),
+        dict(Start='2020-08-01 00:02:30', Finish='2020-08-01 00:05:50', Resource='3-4-3', Task=''),
+        dict(Start='2020-08-01 00:08:30', Finish='2020-08-01 00:12:20', Resource='4-3-3', Task=''),
+        dict(Start='2020-08-01 00:12:20', Finish='2020-08-01 00:22:00', Resource='5-2-3', Task=''),
+        dict(Start='2020-08-01 00:32:00', Finish='2020-08-01 00:43:20', Resource='4-3-3', Task=''),
+        dict(Start='2020-08-01 00:54:00', Finish='2020-08-01 01:04:20', Resource='4-3-3', Task=''),
+        dict(Start='2020-08-01 01:05:18', Finish='2020-08-01 01:06:18', Resource='4-3-3', Task=''),
+        dict(Start='2020-08-01 01:11:14', Finish='2020-08-01 01:23:14', Resource='5-2-3', Task='')]
+
+    colors = {'4-3-3': 'rgb(220, 0, 0)',
+            '3-4-3': 'rgb(20, 0, 220)',
+            '5-2-3': 'rgb(0, 255, 100)'}
+
+
+    
+
     fig=draw_pitch()
     fig.add_trace(
             go.Scatter(
@@ -138,6 +165,9 @@ def show_dummy():
                 y=[0, 0],
                 mode='markers'
     ))
+    
+    fig = ff.create_gantt(df, colors=colors, index_col='Resource', show_colorbar=True,
+                        group_tasks=True)
     return dcc.Graph(
         figure=fig,
         id='my-graph'

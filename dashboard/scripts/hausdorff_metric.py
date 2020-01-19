@@ -6,9 +6,9 @@ import itertools
 
 from hausdorff import hausdorff_distance
 
-from tacticon.Pitch import Pitch
-from array_operations import combine_xy, get_mean, move_formation
-from formations import get_formations
+from dashboard.scripts.tacticon.Pitch import Pitch
+from dashboard.scripts.array_operations import combine_xy, get_mean, move_formation
+from dashboard.scripts.formations import get_formations
     
 #    hd=hausdorff_distance(team, formation, distance="euclidean")
 #    print(hd)
@@ -52,10 +52,10 @@ def calculate_formation(player_positions):
     plt.show()
 
 def calculate_formations(formations):
+    res=[]
     print('Standardformation wird geladen und verschoben.')
     print('Hausdorff-Distanz wird berechnet.')
-    i=1
-    for formation in formations:
+    for i, formation in enumerate(formations):
         team_mean=get_mean(formation)
         def_formations = get_formations()
         formations_moved = move_formation(team_mean,def_formations)
@@ -67,10 +67,12 @@ def calculate_formations(formations):
                 hd_min=[key,hd]
 
         print('Ergebnis',i,':', hd_min)
-        Pitch("#195905", "#faf0e6")
-        for player in formation:
-            plt.scatter(player[0], player[1], c='red', zorder=10)
-        for positions in formations_moved[hd_min[0]]:
-            plt.scatter(positions[0], positions[1], c='grey', zorder=10)
-        plt.show()
-        i+=1
+        res.append(i)
+        #Pitch("#195905", "#faf0e6")
+        #for player in formation:
+        #    plt.scatter(player[0], player[1], c='red', zorder=10)
+        #for positions in formations_moved[hd_min[0]]:
+        #    plt.scatter(positions[0], positions[1], c='grey', zorder=10)
+        #plt.show()
+        #i+=1
+    return res
