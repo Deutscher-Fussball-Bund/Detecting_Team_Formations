@@ -27,12 +27,15 @@ def start_analysis(path,info_path,match_id,team_id,time_intervall,possession,sta
     event_data = RawEventDataReader(path)
     print('XML-Datei geladen.')
     team_df,signs = prepare_team_df(event_data,info_path,team_id)
-    do_check,possession=check_possession(possession,match_id,team_id)
+    do_check,possession = check_possession(possession,match_id,team_id)
     frames=time_intervall*25
     print('Get Formations')
     formations=get_avg_formations(team_df,frames,start,end,sapc,signs,do_check,possession)
     print('Calculate Formations')
-    calculate_formations(formations)
+    avg_formation,hd_min=calculate_formation(formations)
+    print('++++++++++++++++++')
+    hd_mins=calculate_formations(formations)
+    return avg_formation,hd_min,formations,hd_mins
 
 def start_clustering_team(path,info_path,team_id):
     print('')

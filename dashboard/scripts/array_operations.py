@@ -2,15 +2,16 @@ import numpy as np
 
 from statistics import mean
 
-def combine_xy(array, color):
+def combine_xy(array):
     x_pos=[]
     y_pos=[]
-    player_positions=[]
+    xy=[]
     for player in array:
-        x_pos.append(player[0][0])
-        y_pos.append(player[1][0])
-    player_positions.append([x_pos,y_pos,color])
-    return player_positions
+        x_pos.append(player[0])
+        y_pos.append(player[1])
+    xy.append(x_pos)
+    xy.append(y_pos)
+    return xy
 
 def get_mean(array):
     x_pos=[]

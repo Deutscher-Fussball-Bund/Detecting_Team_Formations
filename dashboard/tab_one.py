@@ -1,12 +1,33 @@
+import json
+
 import dash
 import dash_core_components as dcc
 import dash_daq as daq
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import dash_bio as dashbio
 
 from dashboard.file_management import get_match_list,get_team_list
+import plotly.graph_objects as go
 
-team_list=['Deutschland','Niederlande']
+tabs_styles = {
+    'height': '36px',
+    'width': '256px'
+}
+tab_style = {
+    'borderBottom': '1px solid #d6d6d6',
+    'padding': '5px',
+}
+
+tab_selected_style = {
+    'borderTop': '1px solid #d6d6d6',
+    'borderBottom': '1px solid #d6d6d6',
+    'backgroundColor': '#119DFF',
+    'color': 'white',
+    'padding': '5px',
+    'fontWeight': 'bold'
+}
+
 
 def create_tab_one():
     return html.Div([
@@ -14,12 +35,13 @@ def create_tab_one():
             html.Div(
                 id="left-column",
                 className="four columns",
-                children=[description_card(), generate_match_card()]
-                + [
-                    html.Div(
-                        ["initial child"], id="output-clientside", style={"display": "none"}
-                    )
-                ],
+                children=[dcc.Tabs(id="column-tabs", value='column-tab-1',
+                    children=[
+                        dcc.Tab(label='Info', value='column-tab-1', style=tab_style, selected_style=tab_selected_style),
+                        dcc.Tab(label='Team 1', value='column-tab-2', style=tab_style, selected_style=tab_selected_style),
+                        dcc.Tab(label='Team 2', value='column-tab-3', style=tab_style, selected_style=tab_selected_style),
+                    ], style=tabs_styles),
+                    html.Div(id='column-tabs-content')]
             ),
             # Right column
             html.Div(
@@ -32,7 +54,8 @@ def create_tab_one():
                         children=[
                             html.Br(),
                             html.B("Game Situation"),
-                            html.Div(id='gr')
+                            html.Div(id='gr'),
+                            html.Div(id='gr2')
                         ],
                     )
                 ]
@@ -41,7 +64,11 @@ def create_tab_one():
 
 
 
-def description_card():
+def create_column_tab_three():
+    print('ja')
+
+
+def create_column_tab_one():
     """
     :return: A Div containing dashboard title & descriptions.
     """
@@ -58,7 +85,7 @@ def description_card():
     )
 
 
-def generate_match_card():
+def create_column_tab_two():
     """
     :return: A Div containing controls for graphs.
     """
@@ -67,11 +94,11 @@ def generate_match_card():
         id="match-card",
         children=[
             html.Br(),
-            html.P("Select Match"),
+            html.H6("Select Match"),
             dcc.Dropdown(
                 id="match-select",
                 options=[{"label": i[0], "value": i[1]} for i in match_list],
-                style = dict(width = '15em')
+                style = dict(width = '20em')
             ),
             html.Div(id="match-controls")
         ]
@@ -87,8 +114,7 @@ def add_match_controls(match_id):
         id="control-card",
         children=[
             html.Br(),
-            html.Br(),
-            html.P("Select Team"),
+            html.H6("Select Team"),
             dcc.Dropdown(
                 id="team-select",
                 options=[{"label": i[0], "value": i[1]} for i in team_list],
@@ -102,7 +128,7 @@ def add_match_settings():
     return html.Div(
         children=[
             html.Br(),
-            html.P("Select Time Window"),
+            html.H6("Select Time Window"),
             dcc.RangeSlider(
                 id='slider-window',
                 count=1,
@@ -113,7 +139,8 @@ def add_match_settings():
             ),
             html.Div(id='slider-output-container'),
             html.Br(),
-            html.P("Select Time Frame Size"),
+            html.Br(),
+            html.H6("Select Time Frame Size"),
             daq.NumericInput(
                 id='time-input',
                 min=0,
@@ -121,22 +148,23 @@ def add_match_settings():
                 max=120
             ),
             html.Br(),
+            html.H6(id='ex_secs',children=['Exclude Seconds After Possession Change']),
+            daq.NumericInput(
+                id='ex_secs-input',
+                min=0,
+                value=1,
+                max=10
+            ),
             html.Br(),
-            html.P("Ball Possession Phase"),
+            html.H6("Ball Possession Phase"),
             dcc.RadioItems(
                 id='possession-radio',
                 options=[
                     {'label': 'Ball possession', 'value': 'bp'},
-                    {'label': 'No ball possession', 'value': 'npb'},
+                    {'label': 'No ball possession', 'value': 'nbp'},
                     {'label': 'Both', 'value': 'bo'}
                 ],
                 value='bo'
-            ),
-            html.Br(),
-            html.P(id='ex_secs',children=['Exclude Seconds After Possession Change']),
-            daq.Knob(
-                id='knob',
-                value=3
             ),
             html.Br(),
             html.Div(

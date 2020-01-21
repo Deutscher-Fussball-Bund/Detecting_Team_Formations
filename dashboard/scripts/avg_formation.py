@@ -30,7 +30,8 @@ def get_halftime(team_df):
 
 def cut_halftimes(halftimes,start_min,end_min):
     start=halftimes[0] + start_min*25*60
-    end=halftimes[0] + (end_min+1)*25*60
+    if end_min>45: end=halftimes[2] + (end_min-45+1)*25*60
+    else: end=halftimes[0] + (end_min+1)*25*60
     res=[]
     s=0
     if start_min==0:
@@ -46,7 +47,7 @@ def cut_halftimes(halftimes,start_min,end_min):
             res.append(halftimes[2])
             res.append(end)
             return res,s
-        else: return halftimes
+        else: return halftimes,s
     
     if start_min<46:
         res.append(start)
@@ -120,25 +121,19 @@ def get_avg_formations(team_df,frames,start,end,sapc,signs,do_check,possession):
         i = analysis_time[k]
         while i<analysis_time[k+1]:
             j=i+frames
-            print('i,j',i,j)
             if j>analysis_time[k+1]:j=analysis_time[k+1]
             for substitution in substitutions:
                 if substitution>i and substitution<j:
                     j=substitution
-            print(i,j)
             if team_df[i:j].mean()['Ball']['BallPossession']>1 and team_df[i:j].mean()['Ball']['BallPossession']<2: #Test, ob es kein Ballbesitzwechsel gab
-                print('Ball wechsel',i,j)
                 i+=sapc+1 #3 Sekunden werden übersprungen
-                print(i,j)
                 continue
             if do_check:
                 if team_df[i:j].mean()['Ball']['BallStatus']==0 or team_df[i:j].mean()['Ball']['BallPossession']!=possession: #Test, ob Ball nicht im Aus war oder #Test, ob richtige Mannschaft in Ballbesitz war
                     i=j+1
                     continue
             formations.append(get_formation_wo_ball(team_df,i,j,signs[s]))
-            print('bin hier',i,j)
             i=j+1
-            print(i,j)
         k+=2
         s+=1
     return formations

@@ -1,5 +1,60 @@
 import plotly.graph_objects as go
 import numpy as np
+import pandas as pd
+from dashboard.scripts.array_operations import combine_xy
+import dash_core_components as dcc
+
+
+
+def add_formation(formation,fig):
+    xy=combine_xy(formation)
+    x=xy[0]
+    y=xy[1]
+    fig.add_trace(
+            go.Scatter(
+                x=x,
+                y=y,
+                mode='markers'
+    ))
+    return fig
+
+def setup_pitch(avg_formation,hd_min):
+    fig=draw_pitch()
+    fig=add_formation(avg_formation,fig)
+    graph2 = dcc.Graph(
+        figure=fig,
+        id='pitch-graph'
+    )
+    return graph2
+
+def setup_timeline(formations,hd_mins):
+    x_labels=[]
+    for i,formation in enumerate(formations):
+        x_labels.append('F'+str(i))
+        
+    y_labels=[]
+    d=[]
+    for i,hd_min in enumerate(hd_mins):
+        #print(hd_min)
+        #if hd_min[0] not in y_labels:
+        #    y_labels.append(hd_min[0])
+        d.append([x_labels[i],hd_min[0]])
+        y_labels.append(hd_min[0])
+
+    fig = go.Figure()
+    # Create and style traces
+    fig.add_trace(go.Scatter(x=x_labels, y=y_labels, name='Formations', mode='markers'))#, line_shape='hv', line=dict(color='grey', width=4)))
+
+    # Edit the layout
+    fig.update_layout(title='Average Formations',
+                    xaxis_title='Time',
+                    yaxis_title='Formation')
+
+    graph = dcc.Graph(
+        figure=fig,
+        id='timeline-graph'
+    )
+    return graph
 
 #Creates a Circle
 def make_circle(center, radius, n_points=75):
@@ -17,8 +72,6 @@ def draw_pitch():
         path+=' L '+str(x[k])+','+str(y[k])
     path+=' Z'
 
-
-
     fig = go.Figure()
 
     # Set axes ranges
@@ -27,7 +80,7 @@ def draw_pitch():
     fig.update_yaxes(range=[-35.5, 35.5])
     fig.update_xaxes(showgrid=False, zeroline=False)
     fig.update_yaxes(showgrid=False, zeroline=False)
-    fig.update_layout(plot_bgcolor='#195905', autosize=False)
+    fig.update_layout(plot_bgcolor='#195905', autosize=False, showlegend=False)
     fig.update_layout(margin=dict(l=35, r=35, t=30, b=20))
 
     # Add Halfway line
