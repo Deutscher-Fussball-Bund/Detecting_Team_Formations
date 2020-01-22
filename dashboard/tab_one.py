@@ -55,12 +55,15 @@ def create_tab_one():
                             html.Br(),
                             dcc.Loading(id="loading-1", type="default",
                                 children=[
-                                    html.Div(id='graph1'),
-                                    html.Div(id='graph2'),
-                                    html.Div(id='graph3'),
-                                    html.Div(id='graph4'),
+                                    html.Div(id='versuch')
                                     ]
                             ),
+                            html.Div(children=[
+                                html.Div(id='graph1'),
+                                html.Div(id='graph2'),
+                                html.Div(id='graph3'),
+                                html.Div(id='graph4')
+                            ]),
                             html.Br()
                         ],
                     )

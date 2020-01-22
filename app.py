@@ -131,7 +131,8 @@ def display_value(value):
 
 
 # Start Analysis
-@app.callback([Output('graph1', 'children'),
+@app.callback([Output('versuch','children'),
+                Output('graph1', 'children'),
                 Output('graph2','children'),
                 Output('graph4', 'children'),
                 Output('graph3','children'),
@@ -182,7 +183,7 @@ def check_values(n_clicks,match_id,team_id,value_slider,time_intervall,possessio
                 data['formations_2']=formations
                 data['hd_min_2']=hd_min
                 data['hd_mins_2']=hd_mins
-        return graph1, graph2, graph4, graph3, data
+        return None, graph1, graph2, graph4, graph3, data
         
 
 # Select Time Frame on Timeline Graph 1
