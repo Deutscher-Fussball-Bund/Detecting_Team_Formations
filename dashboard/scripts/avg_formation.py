@@ -112,11 +112,8 @@ def get_avg_formations(team_df,frames,start,end,sapc,signs,do_check,possession):
     #sapc in frames
     sapc = round(sapc*25)
 
-    print('alles vorbereitet')
     formations=[]
     k=0
-    print('analysis_time',analysis_time)
-    print('frames',frames, 'sapc',sapc)
     while k < len(analysis_time):
         i = analysis_time[k]
         while i<analysis_time[k+1]:

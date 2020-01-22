@@ -2,13 +2,12 @@ import os
 from dashboard.scripts.tacticon.RawEventDataReader import RawEventDataReader
 
 from dashboard.scripts.hausdorff_metric import calculate_formation,calculate_formations
-from dashboard.scripts.team import create_team_df,exclude_gks,add_ball_details
 from dashboard.scripts.avg_formation import get_avg_formations
 from dashboard.scripts.kmeans import calculate_cluster
 from dashboard.scripts.array_operations import move_formations_to_centre_spot
 from dashboard.scripts.matchinformation import get_team_ids,indentify_team
 
-def start_analysis(path,info_path,match_id,team_id,time_intervall,possession,start,end,sapc):
+def start_analysis(team_df,signs,match_id,team_id,time_intervall,possession,start,end,sapc):
     """
     Startet die Analyse.
 
@@ -22,20 +21,19 @@ def start_analysis(path,info_path,match_id,team_id,time_intervall,possession,sta
         end: Ende der Analyse (Spielminute)
         sapc: seconds after possession change
     """
-    
-    print('Positionsdaten werden geladen.')
-    event_data = RawEventDataReader(path)
-    print('XML-Datei geladen.')
-    team_df,signs = prepare_team_df(event_data,info_path,team_id)
     do_check,possession = check_possession(possession,match_id,team_id)
     frames=time_intervall*25
     print('Get Formations')
     formations=get_avg_formations(team_df,frames,start,end,sapc,signs,do_check,possession)
+
+    if not formations:
+        return False,0,0,0,0
+
     print('Calculate Formations')
     avg_formation,hd_min=calculate_formation(formations)
     print('++++++++++++++++++')
     hd_mins=calculate_formations(formations)
-    return avg_formation,hd_min,formations,hd_mins
+    return True,avg_formation,hd_min,formations,hd_mins
 
 def start_clustering_team(path,info_path,team_id):
     print('')
@@ -115,13 +113,7 @@ def start_clustering_matches(matches):
     cluster=calculate_cluster(formations,20)
     return cluster
 
-def prepare_team_df(event_data,info_path,team_id):
-    team_df=create_team_df(event_data,team_id)
-    print('Torhüter werden entfernt.')
-    team_df,signs=exclude_gks(team_df,info_path)
-    print('Ballinformationen werden hinzugefügt.')
-    team_df=add_ball_details(event_data,team_df)
-    return team_df,signs
+
 
 def check_possession(possession,match_id,team_id):
     """

@@ -1,9 +1,10 @@
-import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
-from dashboard.scripts.array_operations import combine_xy
+
+import plotly.graph_objects as go
 import dash_core_components as dcc
 
+from dashboard.scripts.array_operations import combine_xy
 
 
 def add_formation(formation,fig):
@@ -18,16 +19,43 @@ def add_formation(formation,fig):
     ))
     return fig
 
-def setup_pitch(avg_formation,hd_min):
+def setup_pitch1(avg_formation,hd_min):
     fig=draw_pitch()
     fig=add_formation(avg_formation,fig)
+    fig.update_layout(title='Detected Formation: '+hd_min[0])
     graph2 = dcc.Graph(
         figure=fig,
-        id='pitch-graph'
+        id='pitch-graph1'
     )
     return graph2
 
-def setup_timeline(formations,hd_mins):
+def setup_pitch2(avg_formation,hd_min):
+    fig=draw_pitch()
+    fig=add_formation(avg_formation,fig)
+    fig.update_layout(title='Detected Formation: '+hd_min[0])
+    graph3 = dcc.Graph(
+        figure=fig,
+        id='pitch-graph2'
+    )
+    return graph3
+
+def setup_timeline1(formations,hd_mins):
+    fig = create_timeline_fig(formations,hd_mins)
+    graph1 = dcc.Graph(
+        figure=fig,
+        id='timeline-graph1'
+    )
+    return graph1
+
+def setup_timeline2(formations,hd_mins):
+    fig = create_timeline_fig(formations,hd_mins)
+    graph4 = dcc.Graph(
+        figure=fig,
+        id='timeline-graph2'
+    )
+    return graph4
+
+def create_timeline_fig(formations,hd_mins):
     x_labels=[]
     for i,formation in enumerate(formations):
         x_labels.append('F'+str(i))
@@ -35,9 +63,6 @@ def setup_timeline(formations,hd_mins):
     y_labels=[]
     d=[]
     for i,hd_min in enumerate(hd_mins):
-        #print(hd_min)
-        #if hd_min[0] not in y_labels:
-        #    y_labels.append(hd_min[0])
         d.append([x_labels[i],hd_min[0]])
         y_labels.append(hd_min[0])
 
@@ -46,15 +71,9 @@ def setup_timeline(formations,hd_mins):
     fig.add_trace(go.Scatter(x=x_labels, y=y_labels, name='Formations', mode='markers'))#, line_shape='hv', line=dict(color='grey', width=4)))
 
     # Edit the layout
-    fig.update_layout(title='Average Formations',
-                    xaxis_title='Time',
-                    yaxis_title='Formation')
-
-    graph = dcc.Graph(
-        figure=fig,
-        id='timeline-graph'
-    )
-    return graph
+    fig.update_layout(xaxis_title='Time',yaxis_title='Formation')
+    
+    return fig
 
 #Creates a Circle
 def make_circle(center, radius, n_points=75):

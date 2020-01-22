@@ -53,9 +53,15 @@ def create_tab_one():
                         id="football pitch",
                         children=[
                             html.Br(),
-                            html.B("Game Situation"),
-                            html.Div(id='gr'),
-                            html.Div(id='gr2')
+                            dcc.Loading(id="loading-1", type="default",
+                                children=[
+                                    html.Div(id='graph1'),
+                                    html.Div(id='graph2'),
+                                    html.Div(id='graph3'),
+                                    html.Div(id='graph4'),
+                                    ]
+                            ),
+                            html.Br()
                         ],
                     )
                 ]
@@ -64,14 +70,14 @@ def create_tab_one():
 
 
 
-def create_column_tab_three():
-    print('ja')
+
 
 
 def create_column_tab_one():
     """
     :return: A Div containing dashboard title & descriptions.
     """
+    match_list=get_match_list()
     return html.Div(
         id="description-card",
         children=[
@@ -81,34 +87,49 @@ def create_column_tab_one():
                 id="intro",
                 children="Explore tactical orientation of football teams during various game phases.",
             ),
+            html.Div(
+                id="match-card",
+                children=[
+                    html.Br(),
+                    html.H6("Select Match"),
+                    dcc.Dropdown(
+                        id="match-select",
+                        options=[{"label": i[0], "value": i[1]} for i in match_list],
+                        style = dict(width = '20em')
+                    )
+                ]
+            )
         ],
     )
 
 
-def create_column_tab_two():
+def create_column_tab_two(match_id):
     """
     :return: A Div containing controls for graphs.
     """
-    match_list=get_match_list()
+    if match_id is None:
+        return html.H6("Please select a match in the Info Tab")
+    team_list=get_team_list(match_id)
     return html.Div(
-        id="match-card",
+        id="control-card",
         children=[
             html.Br(),
-            html.H6("Select Match"),
+            html.H6("Select Team"),
             dcc.Dropdown(
-                id="match-select",
-                options=[{"label": i[0], "value": i[1]} for i in match_list],
+                id="team-select",
+                options=[{"label": i[0], "value": i[1]} for i in team_list],
                 style = dict(width = '20em')
             ),
-            html.Div(id="match-controls")
+            html.Div(id='match-settings')
         ]
     )
 
-
-def add_match_controls(match_id):
+def create_column_tab_three(match_id):
     """
     :return: A Div containing controls for graphs.
     """
+    if match_id is None:
+        return html.H6("Please select a match in the Info Tab")
     team_list=get_team_list(match_id)
     return html.Div(
         id="control-card",
@@ -170,7 +191,6 @@ def add_match_settings():
             html.Div(
                 id="start-btn-outer",
                 children=html.Button(id="start-btn", children="Go"),
-            ),
-            html.Br()
+            )
         ]
     )
