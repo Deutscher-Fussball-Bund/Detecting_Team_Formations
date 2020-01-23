@@ -34,7 +34,7 @@ def create_tab_one():
             # Left column
             html.Div(
                 id="left-column",
-                className="four columns",
+                className="three columns",
                 children=[dcc.Tabs(id="column-tabs", value='column-tab-1',
                     children=[
                         dcc.Tab(label='Info', value='column-tab-1', style=tab_style, selected_style=tab_selected_style),
@@ -46,16 +46,15 @@ def create_tab_one():
             # Right column
             html.Div(
                 id="right-column",
-                className="eight columns",
+                className="nine columns",
                 children=[
-                    # Patient Volume Heatmap
                     html.Div(
                         id="football pitch",
                         children=[
                             html.Br(),
                             dcc.Loading(id="loading-1", type="default",
                                 children=[
-                                    html.Div(id='versuch')
+                                    html.Div(id='loading-analytics')
                                     ]
                             ),
                             html.Div(children=[

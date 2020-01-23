@@ -12,6 +12,24 @@ from dashboard.scripts.team import create_team_df,exclude_gks,add_ball_details
 from dashboard.scripts.matchinformation import get_match_id,get_match_title,get_match_id_from_position,get_matchinformation,get_matches,get_teams,extend_matchinfo_dic,delete_row
 
 
+def check_participation(match_ids,team_ids):
+    pairs=[]
+    for match_id in match_ids:
+        for team_id in get_teams(match_id):
+            if team_id[1] in team_ids:
+                pairs.append([match_id,team_id[1]])
+    return pairs
+
+
+def create_pairs(match_ids):
+    pairs=[]
+    for match_id in match_ids:
+        for team_id in get_teams(match_id):
+            pairs.append([match_id,team_id[1]])
+    return pairs
+
+
+
 def load_team_df(match_id,team_id):
     dirname=os.path.dirname(__file__)
     signs_path=os.path.join(dirname,'../../uploads',match_id,'signs_'+team_id+'.p')
@@ -49,7 +67,7 @@ def new_match(fileName, contents):
     path=create_match_folder(path,match_id)
     if path==None:
         print('Spiel wurde schon hochgeladen.')
-        return
+        return 'uploaded'
     filename=path+'/matchinformation_'+match_id+'.xml'
     with open(filename, "w") as f:
         f.write(decoded_matchinfo)

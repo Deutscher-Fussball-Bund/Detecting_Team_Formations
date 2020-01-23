@@ -14,11 +14,12 @@ from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 
 from dashboard.tab_one import create_tab_one,add_match_settings,create_column_tab_one,create_column_tab_two,create_column_tab_three
-from dashboard.tab_two import create_tab_two,create_second_upload,create_right_column
-from dashboard.file_management import new_match,move_match,delete_selected_rows,load_team_df
-from dashboard.pitch import draw_pitch,setup_pitch1,setup_pitch2,setup_timeline1,setup_timeline2,add_formation
+from dashboard.tab_two import create_tab_two,create_settings
+from dashboard.tab_three import create_tab_three,create_second_upload,create_right_column
+from dashboard.file_management import new_match,move_match,delete_selected_rows,load_team_df,check_participation,create_pairs
+from dashboard.pitch import draw_pitch,setup_pitch1,setup_pitch2,setup_pitch3,setup_timeline1,setup_timeline2,add_formation
 
-from dashboard.scripts.start_analysis import start_analysis
+from dashboard.scripts.start_analysis import start_analysis,start_clustering_matches
 
 
 app = dash.Dash(
@@ -40,9 +41,10 @@ app.layout = html.Div([
                     html.Img(src=app.get_asset_url("ISS-Logo.png")),
                     html.Img(src=app.get_asset_url("DFB-Logo.png"))],
     ),
-    dcc.Tabs(id="tabs", value='tab-1', children=[
-        dcc.Tab(label='Analytics Dashboard', value='tab-1'),
-        dcc.Tab(label='Upload', value='tab-2'),
+    dcc.Tabs(id="tabs", value='tab-1', style={'borderBottom': '1px solid #d6d6d6', 'height': '50px'}, children=[
+        dcc.Tab(label='Tactical Dashboard', value='tab-1', style={'padding': '12px'}, selected_style={'padding': '12px'}),
+        dcc.Tab(label='Clustering Analysis', value='tab-2', style={'padding': '12px'}, selected_style={'padding': '12px'}),
+        dcc.Tab(label='Upload', value='tab-3', style={'padding': '12px'}, selected_style={'padding': '12px'}),
     ]),
     html.Div(id='tabs-content')
 ])
@@ -59,16 +61,18 @@ def render_content(tab):
         return create_tab_one()
     elif tab == 'tab-2':
         return create_tab_two()
+    elif tab == 'tab-3':
+        return create_tab_three()
 
 
 ### Callsbacks for File Management ###
 # Matchinfo upload
-@app.callback(Output('another-column', 'children'),
+@app.callback(Output('upload-position-column', 'children'),
                 [Input('upload_matchinfo', 'contents')],
                 [State('upload_matchinfo', 'filename')])
 def upload_matchinfo(contents,filename):
     if contents is not None:
-       return create_second_upload(new_match(filename, contents))
+        return create_second_upload(new_match(filename, contents))
 
 
 # Positional data upload
@@ -131,7 +135,7 @@ def display_value(value):
 
 
 # Start Analysis
-@app.callback([Output('versuch','children'),
+@app.callback([Output('loading-analytics','children'),
                 Output('graph1', 'children'),
                 Output('graph2','children'),
                 Output('graph4', 'children'),
@@ -150,7 +154,7 @@ def display_value(value):
                 State('graph2','children'),
                 State('graph3', 'children'),
                 State('graph4','children')])
-def check_values(n_clicks,match_id,team_id,value_slider,time_intervall,possession,sapc,tab,data,graph1,graph2,graph3,graph4):
+def check_values_for_analysis(n_clicks,match_id,team_id,value_slider,time_intervall,possession,sapc,tab,data,graph1,graph2,graph3,graph4):
     if n_clicks is not None:
         print('')
 
@@ -210,6 +214,48 @@ def test2(clickData,figure,data):
     new_fig=add_formation(data['avg_formation_2'],new_fig)
     new_fig=add_formation(data['formations_2'][n],new_fig)
     return new_fig
+
+
+### Callboacks for Clustering Analysis ###
+# Select Match/Matches
+@app.callback(Output('settings-div', 'children'),
+                [Input('match-select-clustering','value')])
+def matches_selected(value):
+    if value is not None:
+        return create_settings(value)
+
+
+# Start Clustering
+@app.callback([Output('loading-clustering','children'),
+                Output('clustering-graph', 'children')],
+                [Input('start-btn-clustering', 'n_clicks')],
+                [State('match-select-clustering','value'),
+                State('follow-team-select', 'value'),
+                State('ex_secs-input-clustering','value'),
+                State('no_cluster-input', 'value'),
+                State('possession-radio-clustering', 'value'),
+                State('clustering-graph','children')])
+def check_values_for_clustering(n_clicks,match_ids,team_ids,sapc,n_cluster,possession,graph):
+    if n_clicks is not None:
+        print('Clustering wurde gestartet:',match_ids,team_ids,sapc,n_cluster,possession)
+
+        if not team_ids:
+            match_id_team_id_pair=create_pairs(match_ids) 
+        else:
+            team_ids=team_ids.split(';')
+            match_id_team_id_pair=check_participation(match_ids,team_ids)
+        print(match_id_team_id_pair)
+        print('')
+        # tdfs = team_df and signs
+        tdfs=[]
+        for [match_id,team_id] in match_id_team_id_pair:
+            team_df,signs=load_team_df(match_id,team_id)
+            tdfs.append([team_df,signs])
+
+        clusters = start_clustering_matches(tdfs,match_id_team_id_pair,sapc,n_cluster,possession)
+
+        graph=setup_pitch3(clusters)
+        return None, graph
 
 
 if __name__ == '__main__':

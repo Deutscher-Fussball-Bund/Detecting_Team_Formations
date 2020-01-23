@@ -1,7 +1,5 @@
 import numpy as np
 
-from dashboard.scripts.matchinformation import get_gks
-
 def get_substitutions(team_df, halftime):
     #Auswechslung erkennen
     substitutions = {}
@@ -78,17 +76,6 @@ def cut_halftimes(halftimes,start_min,end_min):
             res.append(halftimes[3])
             return res,s
 
-def get_formation(team_df,ff,lf,invert):
-    k=0
-    formation=[]
-    while k<len(team_df[ff:lf].mean(skipna = True)):
-        if np.isnan(team_df.loc[ff][k]):
-            k+=2
-            continue
-        formation.append([round(team_df[ff:lf].mean(skipna = True)[k],2)*invert,round(team_df[ff:lf].mean(skipna = True)[k+1],2)*invert])
-        k+=2
-    return formation
-
 def get_formation_wo_ball(team_df,ff,lf,invert):
     k=0
     formation=[]
@@ -135,33 +122,32 @@ def get_avg_formations(team_df,frames,start,end,sapc,signs,do_check,possession):
         s+=1
     return formations
 
-def get_avg_formations_STW(team_df,frames,signs,possession,start,end): #possesion 1/2
+def get_avg_formations_STW(team_df,frames,sapc,signs,do_check,possession):
     # Get the first and last frame of each halftime
     halftimes=get_halftime(team_df)
-    # Adjust reduces the analysis time regarding start and end
-    # Return s, to use the right sign
-    analysis_time,s=cut_halftimes(halftimes,start,end)
     # Get substitutions during the analysis
     substitutions=get_substitutions(team_df,halftimes)
-    do_check,possession=check_possession(possession)
+    sapc = round(sapc*25)
     formations=[]
     k=0
-    while k < len(analysis_time):
-        i = analysis_time[k]
-        while i<analysis_time[k+1]:
+    s=0
+    print(len(halftimes),halftimes)
+    while k < len(halftimes):
+        i = halftimes[k]
+        while i<halftimes[k+1]:
             j=i+frames
-            if j>analysis_time[k+1]:j=analysis_time[k+1]
+            if j>halftimes[k+1]:j=halftimes[k+1]
             for substitution in substitutions:
                 if substitution>i and substitution<j:
                     j=substitution
-
+            if team_df[i:j].mean()['Ball']['BallPossession']>1 and team_df[i:j].mean()['Ball']['BallPossession']<2: #Test, ob es kein Ballbesitzwechsel gab
+                i+=sapc+1 #3 Sekunden werden übersprungen
+                continue
             if do_check:
-                if team_df[i:j].mean()['Ball']['BallPossession']>1 and team_df[i:j].mean()['Ball']['BallPossession']<2: #Test, ob es kein Ballbesitzwechsel gab
-                    i+=75+1 #3 Sekunden werden übersprungen
+                if team_df[i:j].mean()['Ball']['BallStatus']==0 or team_df[i:j].mean()['Ball']['BallPossession']!=possession: #Test, ob Ball nicht im Aus war oder #Test, ob richtige Mannschaft in Ballbesitz war
+                    i+=25+1
                     continue
-                if team_df[i:j].mean()['Ball']['BallStatus']==1: #Test, ob Ball nicht im Aus war
-                    if team_df[i:j].mean()['Ball']['BallPossession']==possession: #Test, ob richtige Mannschaft in Ballbesitz war
-                        formations.append(get_formation_wo_ball(team_df,i,j,signs[s]))
+            formations.append(get_formation_wo_ball(team_df,i,j,signs[s]))
             i+=25+1
         k+=2
         s+=1

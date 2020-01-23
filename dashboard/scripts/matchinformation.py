@@ -1,4 +1,5 @@
 import os
+import shutil
 import pickle
 import xml.etree.ElementTree as ET
 
@@ -122,6 +123,7 @@ def extend_matchinfo_dic(path):
 
 def delete_row(row_id):
     matchinfo_dic=pickle.load(open(dic_path,'rb'))
+    shutil.rmtree(os.path.join(os.path.dirname(__file__), '../../../uploads', list(matchinfo_dic)[row_id]))
     del matchinfo_dic[list(matchinfo_dic)[row_id]]
     pickle.dump(matchinfo_dic,open(dic_path,'wb'))
 

@@ -7,7 +7,7 @@ import dash_core_components as dcc
 from dashboard.scripts.array_operations import combine_xy
 
 
-def add_formation(formation,fig):
+def add_formation(formation,fig,visible):
     xy=combine_xy(formation)
     x=xy[0]
     y=xy[1]
@@ -15,13 +15,14 @@ def add_formation(formation,fig):
             go.Scatter(
                 x=x,
                 y=y,
-                mode='markers'
+                mode='markers',
+                visible=visible
     ))
     return fig
 
 def setup_pitch1(avg_formation,hd_min):
-    fig=draw_pitch()
-    fig=add_formation(avg_formation,fig)
+    fig=draw_pitch(False)
+    fig=add_formation(avg_formation,fig,True)
     fig.update_layout(title='Detected Formation: '+hd_min[0])
     graph2 = dcc.Graph(
         figure=fig,
@@ -30,12 +31,26 @@ def setup_pitch1(avg_formation,hd_min):
     return graph2
 
 def setup_pitch2(avg_formation,hd_min):
-    fig=draw_pitch()
-    fig=add_formation(avg_formation,fig)
+    fig=draw_pitch(False)
+    fig=add_formation(avg_formation,fig,True)
     fig.update_layout(title='Detected Formation: '+hd_min[0])
     graph3 = dcc.Graph(
         figure=fig,
         id='pitch-graph2'
+    )
+    return graph3
+
+def setup_pitch3(clusters):
+    fig=draw_pitch(True)
+    add_formation(clusters[0],fig,True)
+    iterclusters = iter(clusters)
+    next(iterclusters)
+    for cluster in iterclusters:
+        add_formation(cluster,fig,'legendonly')
+    fig.update_layout(title='Clusters')
+    graph3 = dcc.Graph(
+        figure=fig,
+        id='pitch-graph-cluster'
     )
     return graph3
 
@@ -82,7 +97,7 @@ def make_circle(center, radius, n_points=75):
     y=center[1]+radius*np.sin(2*np.pi*t)
     return x, y 
 
-def draw_pitch():
+def draw_pitch(showlegend):
     #SVG path for Centre Circle
     x,y=make_circle([0,0], 9.15)
 
@@ -99,7 +114,7 @@ def draw_pitch():
     fig.update_yaxes(range=[-35.5, 35.5])
     fig.update_xaxes(showgrid=False, zeroline=False)
     fig.update_yaxes(showgrid=False, zeroline=False)
-    fig.update_layout(plot_bgcolor='#195905', autosize=False, showlegend=False)
+    fig.update_layout(plot_bgcolor='#195905', autosize=False, showlegend=showlegend)
     fig.update_layout(margin=dict(l=35, r=35, t=30, b=20))
 
     # Add Halfway line
