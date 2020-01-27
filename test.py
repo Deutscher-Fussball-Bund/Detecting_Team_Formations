@@ -7,6 +7,50 @@ import os
 import pandas as pd
 import numpy as np
 
+from dashboard.tab_one import create_tab_one,add_match_settings,create_column_tab_one,create_column_tab_two,create_column_tab_three
+from dashboard.tab_two import create_tab_two,create_settings
+from dashboard.tab_three import create_tab_three,create_second_upload,create_right_column
+from dashboard.file_management import new_match,move_match,delete_selected_rows,load_team_df,check_participation,create_pairs
+from dashboard.pitch import draw_pitch,setup_pitch1,setup_pitch2,setup_pitch3,setup_timeline1,setup_timeline2,add_formation
+
+from dashboard.scripts.start_analysis import start_analysis,start_clustering_matches
+
+
+match_ids=['DFL-MAT-X03BWS', 'DFL-MAT-003BEU', 'DFL-MAT-003BWS']
+team_ids=None
+sapc=2
+n_cluster=10
+possession='bo'
+
+
+def check_values_for_clustering(match_ids,team_ids,sapc,n_cluster,possession):
+    print('Clustering wurde gestartet:',match_ids,team_ids,sapc,n_cluster,possession)
+
+    if not team_ids:
+        match_id_team_id_pair=create_pairs(match_ids) 
+    else:
+        team_ids=team_ids.split(';')
+        match_id_team_id_pair=check_participation(match_ids,team_ids)
+    print(match_id_team_id_pair)
+    print('')
+    # tdfs = team_df and signs
+    tdfs=[]
+    for [match_id,team_id] in match_id_team_id_pair:
+        team_df,signs=load_team_df(match_id,team_id)
+        tdfs.append([team_df,signs])
+
+    clusters = start_clustering_matches(tdfs,match_id_team_id_pair,sapc,n_cluster,possession)
+
+    return None
+
+
+check_values_for_clustering(match_ids,team_ids,sapc,n_cluster,possession)
+
+
+
+
+
+
 print("F2".split("F")[1])
 quit()
 

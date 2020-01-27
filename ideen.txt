@@ -34,5 +34,11 @@ Clustering k-means
 - 3s wenn ballstatus 0 raus
 
 
-
-
+Güteklasse des Clustering - Experten zeigen? Silhouetten-Wert ist zu wenig
+    A B test. Herausfinden, wie andere die Formation Labeln
+    %: Wie viele wurden korrekt gelabelt
+Einschränkungen benennen, nicht zu sehr voraus sehen
+explorativer Ansatz ist ok. Cluster sind informativ nicht 
+Forschungsfrage herausarbeiten
+Anknüpfungspunkte geben
+    zeitliche analyse rnn

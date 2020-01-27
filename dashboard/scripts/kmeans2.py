@@ -1,62 +1,89 @@
-import matplotlib.pyplot as plt
-from matplotlib.image import imread
-import pandas as pd
-import numpy as np
-import seaborn as sns
-from sklearn.cluster import KMeans, SpectralClustering
-from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples, silhouette_score
 
-def elbow(data):
-    # Run the Kmeans algorithm and get the index of data points clusters
-    sse = []
-    list_k = list(range(1, 40))
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
 
-    for k in list_k:
-        km = KMeans(n_clusters=k)
-        km.fit(data)
-        sse.append(km.inertia_)
+print(__doc__)
 
-    # Plot sse against k
-    plt.figure(figsize=(6, 6))
-    plt.plot(list_k, sse, '-o')
-    plt.xlabel(r'Number of clusters *k*')
-    plt.ylabel('Sum of squared distance')
+def start_validation(formations):
+    # Generating the sample data from make_blobs
+    # This particular setting has one distinct cluster and 3 clusters placed close
+    # together.
+    X = np.array(formations)
+    print('shaping')
+    nsamples, nx, ny = X.shape
+    print(nsamples,nx,ny)
+    d2_train_dataset = X.reshape((nsamples,nx*ny))
+
+    range_n_clusters = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
+    for n_clusters in range_n_clusters:
+        # Create a subplot with 1 row and 2 columns
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        fig.set_size_inches(18, 7)
+
+        # The 1st subplot is the silhouette plot
+        # The silhouette coefficient can range from -1, 1 but in this example all
+        # lie within [-0.1, 1]
+        ax1.set_xlim([-0.1, 1])
+        # The (n_clusters+1)*10 is for inserting blank space between silhouette
+        # plots of individual clusters, to demarcate them clearly.
+        ax1.set_ylim([0, len(X) + (n_clusters + 1) * 10])
+
+        # Initialize the clusterer with n_clusters value and a random generator
+        # seed of 10 for reproducibility.
+        clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+        cluster_labels = clusterer.fit_predict(d2_train_dataset)
+
+        # The silhouette_score gives the average value for all the samples.
+        # This gives a perspective into the density and separation of the formed
+        # clusters
+        silhouette_avg = silhouette_score(d2_train_dataset, cluster_labels)
+        print("For n_clusters =", n_clusters,
+            "The average silhouette_score is :", silhouette_avg)
+
+        # Compute the silhouette scores for each sample
+        sample_silhouette_values = silhouette_samples(d2_train_dataset, cluster_labels)
+
+        y_lower = 10
+        for i in range(n_clusters):
+            # Aggregate the silhouette scores for samples belonging to
+            # cluster i, and sort them
+            ith_cluster_silhouette_values = \
+                sample_silhouette_values[cluster_labels == i]
+
+            ith_cluster_silhouette_values.sort()
+
+            size_cluster_i = ith_cluster_silhouette_values.shape[0]
+            y_upper = y_lower + size_cluster_i
+
+            color = cm.nipy_spectral(float(i) / n_clusters)
+            ax1.fill_betweenx(np.arange(y_lower, y_upper),
+                            0, ith_cluster_silhouette_values,
+                            facecolor=color, edgecolor=color, alpha=0.7)
+
+            # Label the silhouette plots with their cluster numbers at the middle
+            ax1.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))
+
+            # Compute the new y_lower for next plot
+            y_lower = y_upper + 10  # 10 for the 0 samples
+
+        ax1.set_title("The silhouette plot for the various clusters.")
+        ax1.set_xlabel("The silhouette coefficient values")
+        ax1.set_ylabel("Cluster label")
+
+        # The vertical line for average silhouette score of all the values
+        ax1.axvline(x=silhouette_avg, color="red", linestyle="--")
+
+        ax1.set_yticks([])  # Clear the yaxis labels / ticks
+        ax1.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
+
+
+        plt.suptitle(("Silhouette analysis for KMeans clustering on sample data "
+                    "with n_clusters = %d" % n_clusters),
+                    fontsize=14, fontweight='bold')
 
     plt.show()
-
-def silhouette(data):
-    for i, k in enumerate([10, 13, 16, 19]):
-        fig, (ax1) = plt.subplots(1, 1)
-        fig.set_size_inches(18, 7)
-        
-        # Run the Kmeans algorithm
-        km = KMeans(n_clusters=k)
-        labels = km.fit_predict(data)
-        centroids = km.cluster_centers_
-
-        # Get silhouette samples
-        silhouette_vals = silhouette_samples(data, labels)
-
-        # Silhouette plot
-        y_ticks = []
-        y_lower, y_upper = 0, 0
-        for i, cluster in enumerate(np.unique(labels)):
-            cluster_silhouette_vals = silhouette_vals[labels == cluster]
-            cluster_silhouette_vals.sort()
-            y_upper += len(cluster_silhouette_vals)
-            ax1.barh(range(y_lower, y_upper), cluster_silhouette_vals, edgecolor='none', height=1)
-            ax1.text(-0.03, (y_lower + y_upper) / 2, str(i + 1))
-            y_lower += len(cluster_silhouette_vals)
-
-        # Get the average silhouette score and plot it
-        avg_score = np.mean(silhouette_vals)
-        ax1.axvline(avg_score, linestyle='--', linewidth=2, color='green')
-        ax1.set_yticks([])
-        ax1.set_xlim([-0.1, 1])
-        ax1.set_xlabel('Silhouette coefficient values')
-        ax1.set_ylabel('Cluster labels')
-        ax1.set_title('Silhouette plot for the various clusters', y=1.02);
-        
-        
-        plt.show()

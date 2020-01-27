@@ -131,7 +131,6 @@ def get_avg_formations_STW(team_df,frames,sapc,signs,do_check,possession):
     formations=[]
     k=0
     s=0
-    print(len(halftimes),halftimes)
     while k < len(halftimes):
         i = halftimes[k]
         while i<halftimes[k+1]:

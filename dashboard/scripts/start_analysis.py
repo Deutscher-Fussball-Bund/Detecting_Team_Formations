@@ -3,6 +3,7 @@ from dashboard.scripts.avg_formation import get_avg_formations,get_avg_formation
 from dashboard.scripts.kmeans import calculate_cluster
 from dashboard.scripts.array_operations import move_formations_to_centre_spot
 from dashboard.scripts.matchinformation import indentify_team
+from dashboard.scripts.kmeans2 import start_validation
 
 def start_analysis(team_df,signs,match_id,team_id,time_intervall,possession,start,end,sapc):
     """
@@ -38,18 +39,19 @@ def start_clustering_matches(tdfs,match_id_team_id_pair,sapc,n_cluster,possessio
     print(len(tdfs),len(match_id_team_id_pair))
     formations=[]
     for [team_df,signs],[match_id,team_id] in zip(tdfs,match_id_team_id_pair):
-        do_check,possession = check_possession(possession,match_id,team_id)
+        print(possession,match_id,team_id)
+        do_check,possession2 = check_possession(possession,match_id,team_id)
         # Sliding Time Window ist immer 3 Sekunden groß
         frames=3*25
         print('Get Formations',match_id,team_id)
-        formations+=get_avg_formations_STW(team_df,frames,sapc,signs,do_check,possession)
+        formations+=get_avg_formations_STW(team_df,frames,sapc,signs,do_check,possession2)
 
     print('Formationen normalisieren.')
     formations=move_formations_to_centre_spot(formations)
 
     print('Calculate Cluster')
     clusters=calculate_cluster(formations,n_cluster)
-    return clusters
+    return None
 
 
 def check_possession(possession,match_id,team_id):
